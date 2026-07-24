@@ -57,8 +57,12 @@ The artifact defining an **Issue**'s _what & why_ at the functional altitude (**
 _Avoid_: product definition, spec (that is the technical artifact).
 
 **Spec**:
-The artifact defining an **Issue**'s _how_ at the technical altitude — seams, implementation decisions, and testing decisions, written as decisions in prose. Clears `needs-technical-definition` and is attached to the **Issue**. Carries technical decisions, not **User stories**.
+The artifact defining an **Issue**'s _how_ at the technical altitude — a testable **Requirements** contract plus the seams, implementation decisions, and testing decisions that satisfy it, written in prose. Clears `needs-technical-definition` and is attached to the **Issue**. Carries **Requirements**, not **User stories**.
 _Avoid_: PRD, technical spec (just "spec"), design doc.
+
+**Requirement**:
+A testable, stable-ID statement in a **Spec**, each suitable as the basis for one or more acceptance/TDD tests. Grouped by kind — functional (`FR-*`), authorization/access-control (`AR-*`), technical/system (`TR-*`), integration (`IR-*`), or non-functional (`NFR-*`) — and traceable to the **Functional description** IDs (`US-*`, `AC-*`) it derives from. Requirements must not masquerade as **User stories** with technical actors.
+_Avoid_: fake user story, "as an orchestrator" story.
 
 **Sub-issue**:
 A technical child of an **Issue** at the implementation-slices altitude — a tracer-bullet vertical slice produced by `/shape-work` depth and published by `/to-tickets`.
@@ -121,6 +125,7 @@ _Avoid_: backlog, board.
 - An **Issue** is usually born from a **Candidate Issue** as an **Intent statement** with provisional **Complexity** / **Uncertainty**, defined by a **Functional description**, then (only if technical) a **Spec**, and finally broken into many **Sub-issues** at implementation time.
 - If functional definition or the **Spec** reveals that an **Issue** is really multiple functional outcomes, create replacement sibling **Issues** and close/archive the original with trace links; do not use **Sub-issues** for functional decomposition.
 - A **User story** lives on an **Issue**, authored in its **Functional description**.
-- A **Spec** captures the technical decisions for an **Issue**; an **Interface checkpoint** aligns any material **Module** interface the Spec introduces before implementation hardens around it.
+- A **Spec** captures the **Requirements** and technical decisions for an **Issue**; an **Interface checkpoint** aligns any material **Module** interface the Spec introduces before implementation hardens around it.
+- A **Requirement** lives in a **Spec**, derives from the **Issue**'s **User stories** / acceptance criteria where applicable, and maps to one or more tests or implementation constraints.
 - **Issue dependencies** link **Issues** to **Issues**; **Sub-issue dependencies** link **Sub-issues** within one **Issue**. The two never cross levels.
 - The **Issue tracker** stores **Issues** and **Sub-issues**; the mapping is representation owned by `/setup-skills`.
