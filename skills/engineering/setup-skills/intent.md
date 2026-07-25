@@ -2,7 +2,7 @@
 
 How this repo shapes and stores work at the **intent** altitude of [altitudes.md](./altitudes.md) — what a piece of work is and why it exists, before any functional or technical definition.
 
-Intent-altitude work is captured as **Candidate Issues**: one- to three-sentence statements of what and why, shaped breadth-first (many at once) and not yet deepened. A Candidate Issue is a *proposal* — it becomes a real ticket only when published.
+Intent-altitude work is captured as **Candidate Issues**: one- to three-sentence statements of what and why, shaped breadth-first (many at once) and not yet deepened. A Candidate Issue is a *proposal* — it becomes a real Issue only when published.
 
 ## Storage
 
@@ -35,7 +35,7 @@ Capture these fields for each Candidate Issue. Use the shape unless the repo rec
 
 Where each Candidate Issue should go once shaped:
 
-- **`now`** — worth publishing as a ticket now.
+- **`now`** — worth publishing as an Issue now.
 - **`backlog`** — worth keeping, not published now.
 - **`later`** — plausible but deliberately deferred.
 - **`needs-info`** — cannot be safely shaped yet.

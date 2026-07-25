@@ -54,7 +54,7 @@ flowchart LR
   IMP --> CR[/code-review/]
 
   Huge[Huge, foggy effort] --> WF[/wayfinder/]
-  WF --> SW
+  WF -->|map cleared| SW
 ```
 
 Altitude is a property of the work, deepened in place. One aligner shapes it, one publisher persists it:
@@ -66,7 +66,9 @@ Altitude is a property of the work, deepened in place. One aligner shapes it, on
 | Technical | a spec attached to the Issue | depth → technical | an Issue + its spec |
 | Implementation slices | Sub-issues (vertical slices) | depth → slices | Sub-issues wired with blocking edges |
 
-`/wayfinder` sits above all of this for efforts too big for one session: it maps the unknowns as decision tickets and resolves them one at a time, feeding what it learns back into `/shape-work`.
+`/wayfinder` sits above all of this for efforts too big for one session — a greenfield project or a huge build, where the way to the destination isn't visible yet. It charts the unknowns as decision tickets and resolves them one at a time, over as many sessions as it takes, producing decisions rather than deliverables. Save it for the idea you can't hold in one session; a well-scoped feature starts at `/shape-work`.
+
+A cleared map has no open decisions left, so it enters `/shape-work` as settled input: breadth first, into one or more intent-altitude Issues, then depth on any single one that needs a functional description or a spec. That collapse is mostly synthesis — the grilling is aimed only at what the map left open, and a question big enough that the map should have settled it goes back to `/wayfinder`, so the decision lands on the map rather than buried in a spec.
 
 ### 1. Install the skills into your agent
 

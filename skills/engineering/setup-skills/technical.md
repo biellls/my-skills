@@ -8,7 +8,7 @@ The technical altitude's artifact is the **spec**. Functional value already live
 
 Where the spec lives.
 
-**Default:** a spec document attached to or linked from the ticket in the issue tracker; see `docs/agents/issue-tracker.md` for how this repo persists it.
+**Default:** a spec document attached to or linked from the Issue in the issue tracker; see `docs/agents/issue-tracker.md` for how this repo persists it.
 
 **This repo uses:** _(record the choice if different.)_
 

@@ -1,6 +1,6 @@
 ---
 name: shape-work
-description: Grill the user to shape work by breadth or by depth. Breadth turns a goal, idea pile, or roadmap area into a set of Candidate Issues at intent altitude. Depth grills one idea down through the functional (and optionally technical) altitude, building domain docs as it goes. Use when the user wants to plan, discover, or sharpen work before it's published.
+description: Grill the user to shape work by breadth or by depth. Breadth turns a goal, idea pile, or roadmap area into a set of Candidate Issues at intent altitude. Depth grills one idea down through the functional, technical, and implementation-slice altitudes, stopping at the agreed depth and building domain docs as it goes. Use when the user wants to plan, discover, or sharpen work before it's published.
 disable-model-invocation: true
 ---
 
@@ -19,9 +19,11 @@ If the mode isn't obvious from the request, ask which one — one goal split int
 
 ## Non-negotiable interaction contract
 
-Shaping is an interview, not a synthesis task. Unless the user supplies an already-agreed draft and says to use it, run the one-question-at-a-time `/grilling` loop before presenting any shaped result. A full candidate list, functional description, or set of technical decisions produced from repo context alone is a failure. Exploration informs your recommended answer; it never replaces user confirmation.
+Shaping is an interview by default, not a synthesis task. Unless the user supplies an already-agreed draft and says to use it, run the one-question-at-a-time `/grilling` loop before presenting any shaped result. A full candidate list, functional description, or set of technical decisions produced from repo context alone is a failure. Exploration informs your recommended answer; it never replaces user confirmation.
 
 At any point before the shape is confirmed, your next response is one question with your recommended answer — not a finished plan. Ask the highest-leverage question you cannot safely resolve alone, give your recommended answer, then STOP and wait.
+
+**When the input arrives already settled** — an agreed draft, or a body of decisions resolved elsewhere — don't re-derive it: carry those decisions into the house shape, zooming the source for detail instead of asking, and interview only what it genuinely leaves open (commonly the seams). If an open question is big enough that the source should have settled it, the source isn't finished — say so rather than quietly settling it here.
 
 ## Breadth mode
 

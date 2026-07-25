@@ -2,13 +2,13 @@
 
 How this repo shapes work at the **implementation slices** altitude of [altitudes.md](./altitudes.md) — the lowest altitude, where a spec is broken into independently buildable pieces.
 
-The artifact is a set of **Sub-issues**: tracer-bullet vertical slices of the parent ticket, each declaring the Sub-issues that **block** it. A Sub-issue is sized to fit one fresh context window and is demoable or verifiable on its own.
+The artifact is a set of **Sub-issues**: tracer-bullet vertical slices of the parent Issue, each declaring the Sub-issues that **block** it. A Sub-issue is sized to fit one fresh context window and is demoable or verifiable on its own.
 
 ## Storage
 
 Where the Sub-issues live.
 
-**Default:** child issues of the parent ticket on the issue tracker, wired with its native blocking relationship; see `docs/agents/issue-tracker.md` for how this repo persists them.
+**Default:** child issues of the parent Issue on the issue tracker, wired with its native blocking relationship; see `docs/agents/issue-tracker.md` for how this repo persists them.
 
 **This repo uses:** _(record the choice if different.)_
 

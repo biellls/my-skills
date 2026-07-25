@@ -6,11 +6,11 @@ Skills I use daily for code work.
 
 Reachable only when you type them (Claude Code: `disable-model-invocation: true`; Codex: `policy.allow_implicit_invocation: false` in `agents/openai.yaml`).
 
-- **[shape-work](./shape-work/SKILL.md)** — Shape work by breadth (a set of Candidate Issues at intent altitude) or by depth (grill one idea down through the functional and optionally technical altitude, building `CONTEXT.md` and ADRs as it goes). Aligns only — publishing is `/to-tickets`.
+- **[shape-work](./shape-work/SKILL.md)** — Shape work by breadth (a set of Candidate Issues at intent altitude) or by depth (grill one idea down through the functional, technical, and implementation-slice altitudes, building `CONTEXT.md` and ADRs as it goes). Aligns only — publishing is `/to-tickets`.
 - **[triage](./triage/SKILL.md)** — Move issues through a state machine of triage roles.
 - **[improve-codebase-architecture](./improve-codebase-architecture/SKILL.md)** — Scan a codebase for deepening opportunities, present them as a visual HTML report, then grill through whichever one you pick.
 - **[setup-skills](./setup-skills/SKILL.md)** — Configure this repo for the engineering skills (issue tracker, triage labels, domain doc layout). Run once per repo.
-- **[to-tickets](./to-tickets/SKILL.md)** — Publish work that `/shape-work` has already aligned to the tracker — Issues at intent, a functional ticket, a ticket + spec, or a ticket + spec + Sub-issue slices — reading the house-shape and issue-tracker docs. No interview.
+- **[to-tickets](./to-tickets/SKILL.md)** — Publish work that `/shape-work` has already aligned to the tracker — Issues at intent, a functional Issue, an Issue + spec, or an Issue + spec + Sub-issue slices — reading the house-shape and issue-tracker docs. No interview.
 - **[implement](./implement/SKILL.md)** — Build the work described by a spec or set of tickets, driving `/tdd` at pre-agreed seams and closing out with `/code-review` before committing.
 - **[wayfinder](./wayfinder/SKILL.md)** — Plan a huge chunk of work — more than one agent session can hold — as a shared map of decision tickets on the issue tracker, resolved one at a time until the way to the destination is clear.
 

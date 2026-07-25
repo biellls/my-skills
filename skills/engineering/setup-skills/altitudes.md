@@ -35,7 +35,7 @@ See [technical.md](./technical.md) (`docs/agents/technical.md` once scaffolded) 
 
 ### 4. Implementation slices — _what are the independently buildable pieces?_
 
-The spec broken into **Sub-issues**: tracer-bullet vertical slices of the ticket, each sized to one fresh context window and declaring the slices that block it.
+The spec broken into **Sub-issues**: tracer-bullet vertical slices of the Issue, each sized to one fresh context window and declaring the slices that block it.
 
 - **Belongs here:** vertical slices (a complete path through every layer), blocking edges between them, expand–contract sequencing for wide refactors.
 - **Does _not_ belong here:** horizontal one-layer slices, or restating the spec's decisions — a slice references the spec, it doesn't repeat it.
@@ -48,10 +48,10 @@ Shaping and publishing are separate acts. `/shape-work` **shapes** (aligns) at e
 
 | Altitude              | Carried by                                     | Shaped by                        | Published by (`/to-tickets`)              |
 | --------------------- | ---------------------------------------------- | -------------------------------- | ----------------------------------------- |
-| Intent                | an **Issue** (title + intent)                  | `/shape-work` — breadth          | one or more intent-altitude tickets       |
-| Functional            | the **Issue**'s functional description         | `/shape-work` — depth, functional| one functional ticket                     |
-| Technical             | a **spec** attached to the ticket              | `/shape-work` — depth, technical | a ticket + its spec                       |
-| Implementation slices | **Sub-issues** (vertical slices) of the ticket | `/shape-work` — depth, slices    | Sub-issues wired with blocking edges      |
+| Intent                | an **Issue** (title + intent)                  | `/shape-work` — breadth          | one or more intent-altitude Issues        |
+| Functional            | the **Issue**'s functional description         | `/shape-work` — depth, functional| one functional Issue                      |
+| Technical             | a **spec** attached to the Issue               | `/shape-work` — depth, technical | an Issue + its spec                       |
+| Implementation slices | **Sub-issues** (vertical slices) of the Issue  | `/shape-work` — depth, slices    | Sub-issues wired with blocking edges      |
 
 Each artifact appears only from its altitude down: the **spec** exists only once work reaches technical, **Sub-issues** only once it reaches slices. A repo that prefers to settle functional questions before technical ones just stops `/shape-work`'s depth pass at functional and publishes there, deepening later.
 

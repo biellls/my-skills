@@ -116,10 +116,23 @@ _Avoid_: "triage role" as a name for a **State**.
 The external tool of record where **Issues** and **Sub-issues** are stored as rows (GitHub Issues, GitLab Issues, a local `.scratch/` markdown convention, …). Which tool — and how **Issues**, **Sub-issues**, **States**, **Priority**, **Complexity** / **Uncertainty**, and dependencies map onto it — is per-repo config emitted by `/setup-skills`.
 _Avoid_: backlog, board.
 
+### Wayfinding
+
+The vocabulary `/wayfinder` speaks, above the planning-and-delivery altitudes. Bare "ticket" belongs to wayfinding alone — everywhere else the units of work are **Issues** and **Sub-issues**.
+
+**Map**:
+The canonical artifact of one wayfinding effort — a single tracker item holding the effort's destination, its notes, and an index of the decisions made so far, with **Decision tickets** as its children. An index, not a store: each decision lives in its ticket, and the map only gists and links it.
+_Avoid_: epic, plan, roadmap.
+
+**Decision ticket**:
+A child of a **Map** posing one question whose resolution is a decision, sized to a single agent session and typed `research` / `prototype` / `grilling` / `task`. Resolved by a comment and closed, never built from — it produces a decision, not a deliverable, so it is not an **Issue** or a **Sub-issue**.
+_Avoid_: Issue, Sub-issue, task; bare "ticket" outside wayfinding.
+
 ## Relationships
 
 - A **Bucket** holds many **Skills**; each **Skill** is exactly one of **User-invoked** or **Model-invoked**.
 - A repo has one current **Project development stage** within the **Project lifecycle**.
+- A **Map** holds many **Decision tickets**; once every one is resolved the map is cleared, and it then enters **Work shaping** as settled input rather than becoming **Issues** directly.
 - **Work shaping** produces work at an **Altitude**: breadth yields **Candidate Issues** at intent altitude; depth deepens one idea through the functional, technical, and implementation-slice altitudes. `/shape-work` aligns; `/to-tickets` publishes.
 - An **Issue** carries exactly one **State** and one **Category** at a time, one **Priority**, and current **Complexity** / **Uncertainty** assessments.
 - An **Issue** is usually born from a **Candidate Issue** as an **Intent statement** with provisional **Complexity** / **Uncertainty**, defined by a **Functional description**, then (only if technical) a **Spec**, and finally broken into many **Sub-issues** at implementation time.
