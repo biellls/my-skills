@@ -156,6 +156,7 @@ Reachable only when explicitly requested.
 | --- | --- |
 | [`grill-me`](./skills/productivity/grill-me/SKILL.md) | Get relentlessly interviewed about a plan or design until every branch is resolved. |
 | [`handoff`](./skills/productivity/handoff/SKILL.md) | Compact the current conversation into a handoff document for another agent. |
+| [`learn-with-conversation`](./skills/productivity/learn-with-conversation/SKILL.md) | Learn any topic through guided conversation, growing understanding one branch at a time from its root insight. |
 | [`teach`](./skills/productivity/teach/SKILL.md) | Learn a new skill or concept over multiple sessions in a stateful workspace. |
 | [`writing-great-skills`](./skills/productivity/writing-great-skills/SKILL.md) | Reference the vocabulary and principles for writing predictable skills. |
 

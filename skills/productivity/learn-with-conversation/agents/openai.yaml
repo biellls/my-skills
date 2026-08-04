@@ -1,0 +1,5 @@
+interface:
+  display_name: "Learn with Conversation"
+  short_description: "Grow understanding from one root insight"
+policy:
+  allow_implicit_invocation: false
