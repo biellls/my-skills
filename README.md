@@ -120,7 +120,7 @@ Reachable only when explicitly requested.
 
 | Skill | Use it to |
 | --- | --- |
-| [`shape-work`](./skills/engineering/shape-work/SKILL.md) | Shape work by breadth (Candidate Issues at intent altitude) or by depth (grill one idea through the functional, technical, and implementation-slice altitudes, building domain docs as it goes). Aligns only. |
+| [`shape-work`](./skills/engineering/shape-work/SKILL.md) | Shape work by breadth (Candidate Issues at intent altitude) or by depth (grill the functional and technical altitudes one at a time, then derive implementation slices from the aligned descriptions). Aligns only. |
 | [`to-tickets`](./skills/engineering/to-tickets/SKILL.md) | Publish what `/shape-work` aligned to the tracker at whatever altitude it reached — Issues, a functional Issue, an Issue + spec, or an Issue + spec + Sub-issue slices. |
 | [`implement`](./skills/engineering/implement/SKILL.md) | Build the work described by a spec or set of tickets, driving `/tdd` at agreed seams and closing out with `/code-review`. |
 | [`wayfinder`](./skills/engineering/wayfinder/SKILL.md) | Plan a huge, foggy effort as a shared map of decision tickets, resolved one at a time until the way to the destination is clear. |

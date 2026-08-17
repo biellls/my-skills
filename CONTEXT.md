@@ -37,7 +37,7 @@ The depth to which a piece of work has been shaped — one of **intent** (a **Ca
 _Avoid_: level, phase, stage (that is a **Project development stage**).
 
 **Work shaping**:
-The activity of turning a goal, idea pile, roadmap area, bug cluster, or messy request into shaped work — by **breadth** (many **Candidate Issues** at the intent altitude) or by **depth** (grilling one idea down through the functional, technical, and implementation-slice altitudes, building domain docs as it goes). It aligns work; it does not publish it.
+The activity of turning a goal, idea pile, roadmap area, bug cluster, or messy request into shaped work — by **breadth** (many **Candidate Issues** at the intent altitude) or by **depth** (grilling one idea through the functional and technical altitudes one at a time, then deriving implementation slices from those aligned descriptions, while building domain docs as decisions land). It aligns work; it does not publish it.
 _Avoid_: sprint planning (too narrow), PRD planning (wrong altitude).
 
 **Candidate Issue**:
@@ -133,7 +133,7 @@ _Avoid_: Issue, Sub-issue, task; bare "ticket" outside wayfinding.
 - A **Bucket** holds many **Skills**; each **Skill** is exactly one of **User-invoked** or **Model-invoked**.
 - A repo has one current **Project development stage** within the **Project lifecycle**.
 - A **Map** holds many **Decision tickets**; once every one is resolved the map is cleared, and it then enters **Work shaping** as settled input rather than becoming **Issues** directly.
-- **Work shaping** produces work at an **Altitude**: breadth yields **Candidate Issues** at intent altitude; depth deepens one idea through the functional, technical, and implementation-slice altitudes. `/shape-work` aligns; `/to-tickets` publishes.
+- **Work shaping** produces work at an **Altitude**: breadth yields **Candidate Issues** at intent altitude; depth grills functional and technical work one altitude at a time and derives implementation slices from the aligned descriptions. `/shape-work` aligns; `/to-tickets` publishes.
 - An **Issue** carries exactly one **State** and one **Category** at a time, one **Priority**, and current **Complexity** / **Uncertainty** assessments.
 - An **Issue** is usually born from a **Candidate Issue** as an **Intent statement** with provisional **Complexity** / **Uncertainty**, defined by a **Functional description**, then (only if technical) a **Spec**, and finally broken into many **Sub-issues** at implementation time.
 - If functional definition or the **Spec** reveals that an **Issue** is really multiple functional outcomes, create replacement sibling **Issues** and close/archive the original with trace links; do not use **Sub-issues** for functional decomposition.

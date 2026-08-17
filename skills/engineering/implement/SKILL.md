@@ -8,6 +8,12 @@ Implement the work described by the user in the spec or tickets.
 
 Read `docs/agents/project-lifecycle.md` if present. Use the **Project development stage** as context when implementation choices have trade-offs (simplicity vs extension, invariants vs defensive handling, deletion vs compatibility), not as a decision rule.
 
+## Issue lifecycle
+
+When the work comes from tracked tickets, read `docs/agents/issue-tracker.md`, fetch the parent Issue and its implementation-slice Sub-issues, and follow the tracker's configured workflow. As the first implementation action—before changing code or dispatching agents—move the parent Issue to **In progress**. Change the parent, not every Sub-issue; use the tracker's native status, label, or status field as documented.
+
+Tie every delegated slice to its exact Sub-issue in the agent brief. As each agent finishes a slice, verify that its changes and slice-level checks are complete, record any completion context the tracker requires, and close that Sub-issue immediately. Do not defer all Sub-issue closures until the parent is finished, and do not close a Sub-issue for failed, partial, or unaccepted work. Closing the parent Issue remains a separate workflow step; do not close it merely because implementation ended.
+
 ## Worktree and starting branch
 
 Work in a dedicated git worktree, never directly in the primary checkout. Before creating it, fetch `origin` and identify the repository's remote default branch (`origin/main` when that is the default); do not rely on a stale local default branch.
