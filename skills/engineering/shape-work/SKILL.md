@@ -10,6 +10,12 @@ Grill the user to shape work into agreed form before it's published. This skill 
 
 Read `docs/agents/altitudes.md` first — it defines the four altitudes (intent, functional, technical, implementation slices) and points at their house shapes (`docs/agents/intent.md`, `docs/agents/functional-issues.md`, `docs/agents/technical.md`, `docs/agents/implementation-slices.md`). Everything below stays inside those altitudes. Also read the domain docs per `docs/agents/domain.md` before shaping, so you use the project's vocabulary.
 
+## Branch domain-document changes
+
+Shape in the conversation unless the work requires modifying `CONTEXT.md` or ADRs. Before the first such edit, fetch `origin`, identify the repository's remote default branch (`origin/main` when that is the default), and create a dedicated branch in a separate git worktree from the latest `origin/<default-branch>`. Do not base it on a stale local branch.
+
+Make all domain-document changes in that worktree and commit them before handoff. Preserve the branch name in the aligned output so `/to-tickets` can push and reference it. Do not create a branch or worktree when shaping produces no file changes.
+
 ## Pick the mode
 
 - **Breadth** — the input is a goal, idea pile, roadmap area, bug cluster, or messy request, and the question is *what work is here*. Produce a set of **Candidate Issues at intent altitude**. Many items, shallow — do NOT deepen any one.
