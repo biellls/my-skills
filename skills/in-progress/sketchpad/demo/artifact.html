@@ -9,13 +9,3 @@
   <blockquote class="callout" id="idea-loop">The working rhythm is simple: notice → sketch → question → try again. A suggestion stays a suggestion until it earns its place.</blockquote>
   <div class="caveat" id="idea-caveat"><strong>Keep it open:</strong> this is a place for useful uncertainty, not a finished answer. The person closest to the problem still supplies the judgment.</div>
 </main>
-<script>
-  function reportSelection() {
-    const selection = window.getSelection();
-    const quote = selection && selection.toString().trim();
-    const node = selection && selection.anchorNode && selection.anchorNode.parentElement?.closest('[id]');
-    if (quote && node) parent.postMessage({ type: 'sketchpad-selection', anchor: { kind: 'html', id: node.id, quote } }, '*');
-  }
-  document.addEventListener('mouseup', reportSelection);
-  document.addEventListener('keyup', reportSelection);
-</script>

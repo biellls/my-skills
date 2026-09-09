@@ -36,7 +36,7 @@ The bundled demo explains this loop. Use a copied workspace for real work; do no
 
 ## Artifact principles
 
-Give the initial HTML enough typography, readable line length, spacing, accessible contrast, and small callouts/comparisons to make a calm thinking space. The defaults are optional: an agent may compose freely and extend/override them. Do not impose sections, density, a diagram, or a schema; after a human has bearings, revise with restraint.
+Give discussion-worthy regions stable HTML `id` attributes; the runtime injects selection support into the sandboxed preview without changing source HTML. Give the initial HTML enough typography, readable line length, spacing, accessible contrast, and small callouts/comparisons to make a calm thinking space. The defaults are optional: an agent may compose freely and extend/override them. Do not impose sections, density, a diagram, or a schema; after a human has bearings, revise with restraint.
 
 ## Collaboration rules
 

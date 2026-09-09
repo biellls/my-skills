@@ -17,7 +17,9 @@ test('serves isolated app and artifact but no arbitrary filesystem path', async 
   assert.match(await (await fetch(f.url+'/artifact')).text(),/When does disagreement help us think/);
   assert.equal((await fetch(f.url+'/../state.json')).status,404);
   assert.equal((await fetch(f.url+'/%2e%2e/%2e%2e/etc/passwd')).status,404);
-  const artifactHeaders=await fetch(f.url+'/artifact'); assert.match(artifactHeaders.headers.get('content-security-policy'),/default-src 'none'/);
+  const artifactHeaders=await fetch(f.url+'/artifact'); assert.match(artifactHeaders.headers.get('content-security-policy'),/default-src 'none'/); assert.match(artifactHeaders.headers.get('content-security-policy'),/sandbox allow-scripts/);
+  assert.match(await artifactHeaders.text(), /sketchpad-selection/);
+  const state=(await api(f.url,'/api/state')).body; assert.equal(state.paths.dataDir,f.data); assert.equal(state.paths.scenePath,path.join(f.data,'scene.excalidraw')); assert.ok(state.workspaceId);
   const preview=await fetch(f.url+'/api/scene/preview.svg'); assert.equal(preview.status,200); assert.match(await preview.text(),/<svg/);
 });
 

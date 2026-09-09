@@ -16,7 +16,7 @@ echo "PID=$SERVER_PID; log=$DATA/server.log; open http://127.0.0.1:4317"
 
 Developers rebuilding from this repository must run `npm ci && npm run build` from the **my-skills repository root**, not from a user's workspace.
 
-The default demo is copied into `DATA`. It uses a small optional artifact stylesheet for typography, readable line length, spacing, accessible colors, callouts, and a comparison; agent-authored HTML can freely compose, extend, or override it. There are no required sections or density rules. In the browser, select a phrase and click **Comment on selection**, send a message, edit the native Excalidraw scene, and click **Save scene + PNG preview**. The server's URL and `DATA` path are printed on start.
+The default demo is copied into `DATA`. It uses a small optional artifact stylesheet for typography, readable line length, spacing, accessible colors, callouts, and a comparison; agent-authored HTML can freely compose, extend, or override it. There are no required sections or density rules. In the browser, select a phrase and click **Comment on selected passage**, send a message, open the native Excalidraw editor, and click **Save diagram + preview**. The server's URL and `DATA` path are printed on start.
 
 In another terminal, receive and act without another model backend:
 
@@ -47,7 +47,15 @@ npm test
 
 This tests queue retry/persistence and batches without self-delivery, both authors and anchors, strict Host/Origin and content-type boundaries, atomic revision checks, PNG invalidation/signature checks, and scene stale-write rejection. It is simulated CLI/API coverage, not live Claude dogfooding. HTTP `curl` checks are API/server smoke checks, not browser smoke tests. For an actual browser screenshot/smoke run, install Playwright separately and use the Chrome app executable: `npm --prefix /tmp/sketchpad-playwright install playwright`, then `SKETCHPAD_URL=http://127.0.0.1:4317 SKETCHPAD_SCREENSHOT=/tmp/sketchpad.png node skills/in-progress/sketchpad/scripts/browser-smoke.js` after starting the server. This mounts, comments, posts a simulated agent proposal, draws, saves, reloads, verifies the official PNG, and captures a screenshot; no live-Claude round trip is claimed.
 
+Run `node skills/in-progress/sketchpad/scripts/browser-regression.js` for a self-contained real-browser check of sandbox isolation, selection in newly authored HTML, draft recovery, unsaved diagram close/reopen, persisted element IDs, and preview-failure recovery. It starts/stops its own temporary server. Set `PLAYWRIGHT_MODULE` and `CHROME_PATH` to override its local Playwright/Chrome paths.
+
 See [REFERENCES.md](REFERENCES.md) for official Excalidraw documentation and inspiration/licensing boundaries.
+
+## Artifact editing and recovery
+
+Give discussion-worthy HTML regions stable `id` attributes. The server injects the selection bridge into its sandboxed preview, not into source files; arbitrary new HTML needs no embedded SDK. Artifact scripts cannot access the privileged shell. The optional stylesheet works inside the sandbox; other external assets/scripts are intentionally restricted in this first prototype.
+
+The `state` command reports the actual server workspace paths (the running server/port selects the workspace). Make a working copy before editing and publish via the revision-checked CLI rather than overwriting operational files directly. Browser chat drafts and their anchors are recovered locally per workspace; diagrams require an explicit save. Closing the editor preserves unsaved edits, and leaving the page warns when diagram edits are unsaved. A browser crash can still lose unsaved drawings. Saves are revision-checked snapshots, not a full version-history/undo system. If an agent change conflicts with an unsaved drawing, export your drawing before reloading and reconcile deliberately.
 
 ## Known limitations
 

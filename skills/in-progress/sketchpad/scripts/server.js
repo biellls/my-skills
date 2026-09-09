@@ -6,6 +6,7 @@ const fsp = fs.promises;
 const path = require('node:path');
 const http = require('node:http');
 const { URL } = require('node:url');
+const { createHash } = require('node:crypto');
 
 const DEMO = path.resolve(__dirname, '..', 'demo');
 const MAX_BODY = 256 * 1024;
@@ -95,6 +96,8 @@ function scenePreview(scene) {
 
 async function createServer({ data, port = 4317, host = '127.0.0.1' }) {
   data = safeDataDir(data); await initData(data);
+  const workspaceId = createHash('sha256').update(data).digest('hex').slice(0, 24);
+  const paths = { dataDir: data, artifactPath: path.join(data, 'artifact.html'), scenePath: path.join(data, 'scene.excalidraw'), previewPath: path.join(data, 'scene-preview.png') };
   const waiters = new Set(); let mutation = Promise.resolve();
   function mutate(fn) {
     const run = mutation.then(async () => {
@@ -111,10 +114,15 @@ async function createServer({ data, port = 4317, host = '127.0.0.1' }) {
       if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method) && !validOrigin(req, server)) return error(res, 403, 'foreign or null Origin rejected');
       if (method === 'GET' && url.pathname === '/') return staticFile(res, path.join(DEMO, 'index.html'), 'text/html; charset=utf-8');
       if (method === 'GET' && url.pathname.startsWith('/assets/')) { const root=path.resolve(DEMO, 'assets'); const asset=path.resolve(root, decodeURIComponent(url.pathname.slice('/assets/'.length))); if (!asset.startsWith(root + path.sep)) return error(res, 404, 'not found'); return staticFile(res, asset, mimeType(asset)); }
-      if (method === 'GET' && url.pathname === '/artifact') return staticFile(res, path.join(data, 'artifact.html'), 'text/html; charset=utf-8', true);
+      if (method === 'GET' && url.pathname === '/artifact') {
+        const html = await fsp.readFile(path.join(data, 'artifact.html'), 'utf8');
+        const bridge = await fsp.readFile(path.join(__dirname, 'artifact-bridge.js'), 'utf8');
+        res.writeHead(200, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff', 'content-security-policy': "sandbox allow-scripts; default-src 'none'; style-src 'self' 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:;" });
+        return res.end(`${html}\n<script>${bridge}</script>`);
+      }
       if (method === 'GET' && url.pathname === '/artifact-defaults.css') return staticFile(res, path.join(DEMO, 'artifact-defaults.css'), 'text/css; charset=utf-8', true);
       if (method === 'GET' && url.pathname === '/api/state') {
-        const s = await readState(data); return json(res, 200, { revision: s.revision, scene: { ...compactScene(s.scene, s.sceneRevision), previewAvailable: s.previewRevision === s.sceneRevision }, artifactRevision: s.artifactRevision, comments: s.comments, events: s.events.map(({ acknowledged, ...e }) => e) });
+        const s = await readState(data); return json(res, 200, { workspaceId, paths, revision: s.revision, scene: { ...compactScene(s.scene, s.sceneRevision), previewAvailable: s.previewRevision === s.sceneRevision }, artifactRevision: s.artifactRevision, comments: s.comments, events: s.events.map(({ acknowledged, ...e }) => e) });
       }
       if (method === 'GET' && url.pathname === '/api/events') {
         const afterRaw = url.searchParams.get('after'); const timeoutRaw = url.searchParams.get('wait'); const timeout = Math.min(Math.max(Number(timeoutRaw || 0), 0), 30000);
@@ -162,7 +170,7 @@ async function createServer({ data, port = 4317, host = '127.0.0.1' }) {
   return { server, data, address: server.address() };
 }
 function mimeType(file) { return { '.js':'text/javascript; charset=utf-8', '.css':'text/css; charset=utf-8', '.woff2':'font/woff2', '.png':'image/png', '.svg':'image/svg+xml' }[path.extname(file)] || 'application/octet-stream'; }
-async function staticFile(res, file, type, sandbox = false) { try { const content = await fsp.readFile(file); res.writeHead(200, { 'content-type': type, 'cache-control': 'no-store', 'content-security-policy': sandbox ? "default-src 'none'; style-src 'self' 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:;" : "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self';", ...(sandbox ? { 'x-content-type-options': 'nosniff' } : {}) }); res.end(content); } catch { error(res, 404, 'not found'); } }
+async function staticFile(res, file, type, sandbox = false) { try { const content = await fsp.readFile(file); res.writeHead(200, { 'content-type': type, 'cache-control': 'no-store', 'content-security-policy': sandbox ? "default-src 'none'; style-src 'self' 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:;" : "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; img-src 'self' data: blob:;", ...(sandbox ? { 'x-content-type-options': 'nosniff' } : {}) }); res.end(content); } catch { error(res, 404, 'not found'); } }
 
 module.exports = { createServer, initialScene, compactScene, initData };
 
