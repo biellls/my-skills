@@ -11,11 +11,27 @@ const api = async (url, options) => {
   if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
   return data;
 };
-const escapeText = (value) => String(value ?? '').replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
 const documentFingerprint = (elements, files) => JSON.stringify({ elements, files });
 const ExcalidrawEditor = React.memo(function ExcalidrawEditor({ initialData, onApi, onChange }) {
   return <Excalidraw initialData={initialData} excalidrawAPI={onApi} onChange={onChange} />;
 });
+
+function messageContent(message) {
+  const lines = String(message || '').split('\n');
+  return lines.map((line, lineIndex) => {
+    const parts = line.split(/(\*\*[^*]+\*\*)/g);
+    return <React.Fragment key={lineIndex}>{lineIndex > 0 && <br />}{parts.map((part, index) => part.startsWith('**') && part.endsWith('**') ? <strong key={index}>{part.slice(2, -2)}</strong> : part)}</React.Fragment>;
+  });
+}
+function anchorText(anchor) {
+  if (!anchor) return '';
+  if (anchor.quote) return `“${anchor.quote}”`;
+  return anchor.label || 'selected diagram element';
+}
+function humanType(type) {
+  return type === 'proposal' ? 'Proposal' : type === 'reply' ? 'Reply' : type === 'comment' ? 'Comment' : type === 'scene.changed' ? 'Diagram saved' : 'Message';
+}
+function humanAuthor(author) { return author === 'agent' ? 'Agent' : 'You'; }
 
 function App() {
   const [state, setState] = useState(null);
@@ -29,6 +45,8 @@ function App() {
   const [status, setStatus] = useState('Loading workspace…');
   const [artifactRevision, setArtifactRevision] = useState(0);
   const [artifactKey, setArtifactKey] = useState(0);
+  const [sceneOpen, setSceneOpen] = useState(false);
+  const [composer, setComposer] = useState({ kind: 'message', anchor: null, replyTo: null });
   const excalidrawApi = useRef(null);
   const initialData = useRef(null);
   const iframe = useRef(null);
@@ -39,16 +57,24 @@ function App() {
   const dirtyRef = useRef(false);
   const persistedFingerprint = useRef('');
   const editorInitialized = useRef(false);
+  const composerRef = useRef(null);
 
   const refresh = async () => {
     try {
       const [nextState, nextScene] = await Promise.all([api('/api/state'), api('/api/scene')]);
       setState(nextState);
       setArtifactRevision((old) => { if (old && old !== nextState.artifactRevision) setArtifactKey((key) => key + 1); return nextState.artifactRevision; });
-      if (!loaded.current) { loaded.current = true; initialData.current = nextScene.scene; sceneRef.current = nextScene.scene; persistedFingerprint.current = documentFingerprint(nextScene.scene.elements, nextScene.scene.files); revisionRef.current = nextScene.revision; setScene(nextScene.scene); setSceneRevision(nextScene.revision); setStatus('Ready. Sketch, select, or send a question.'); }
-      else if (nextScene.revision !== revisionRef.current) {
-        if (dirtyRef.current) setConflict('A newer scene exists. Your unsaved human edit remains here; save it only after resolving the conflict.');
-        else { syncing.current = true; sceneRef.current = nextScene.scene; persistedFingerprint.current = documentFingerprint(nextScene.scene.elements, nextScene.scene.files); revisionRef.current = nextScene.revision; excalidrawApi.current?.updateScene({ elements: nextScene.scene.elements, appState: nextScene.scene.appState, files: nextScene.scene.files }); setScene(nextScene.scene); setSceneRevision(nextScene.revision); setTimeout(() => { syncing.current = false; }, 0); setStatus('Scene updated from the authoritative workspace.'); }
+      if (!loaded.current) {
+        loaded.current = true; initialData.current = nextScene.scene; sceneRef.current = nextScene.scene;
+        persistedFingerprint.current = documentFingerprint(nextScene.scene.elements, nextScene.scene.files); revisionRef.current = nextScene.revision;
+        setScene(nextScene.scene); setSceneRevision(nextScene.revision); setStatus('Ready. Start with the question, a sketch, or a message.');
+      } else if (nextScene.revision !== revisionRef.current) {
+        if (dirtyRef.current) setConflict('A newer diagram exists. Your unsaved edit is still here; save it after resolving the difference.');
+        else {
+          syncing.current = true; sceneRef.current = nextScene.scene; persistedFingerprint.current = documentFingerprint(nextScene.scene.elements, nextScene.scene.files);
+          revisionRef.current = nextScene.revision; excalidrawApi.current?.updateScene({ elements: nextScene.scene.elements, appState: nextScene.scene.appState, files: nextScene.scene.files });
+          setScene(nextScene.scene); setSceneRevision(nextScene.revision); setTimeout(() => { syncing.current = false; }, 0); setStatus('Diagram updated from the workspace.');
+        }
       }
     } catch (error) { setStatus(error.message); }
   };
@@ -57,6 +83,7 @@ function App() {
     const receiveSelection = (event) => { if (event.source !== iframe.current?.contentWindow || event.data?.type !== 'sketchpad-selection') return; setSelectionAnchor(event.data.anchor); };
     window.addEventListener('message', receiveSelection); return () => window.removeEventListener('message', receiveSelection);
   }, []);
+  useEffect(() => { if (composer.kind !== 'message' || composer.anchor || composer.replyTo) composerRef.current?.focus(); }, [composer]);
 
   const submit = async (kind, body) => { await api(`/api/${kind}`, { method: 'POST', body: JSON.stringify({ author: 'human', ...body }) }); await refresh(); };
   const handleChange = useCallback((elements, appState, files) => {
@@ -65,15 +92,14 @@ function App() {
     const nextFingerprint = documentFingerprint(elements, files);
     if (!editorInitialized.current) { editorInitialized.current = true; persistedFingerprint.current = nextFingerprint; dirtyRef.current = false; setDirty(false); }
     const nextDirty = editorInitialized.current && nextFingerprint !== persistedFingerprint.current;
-    dirtyRef.current = nextDirty;
-    setDirty((old) => old === nextDirty ? old : nextDirty);
+    dirtyRef.current = nextDirty; setDirty((old) => old === nextDirty ? old : nextDirty);
     const nextSelection = Object.keys(appState.selectedElementIds || {})[0] || null;
     setSelectedElementId((old) => old === nextSelection ? old : nextSelection);
   }, []);
   const handleExcalidrawApi = useCallback((instance) => { excalidrawApi.current = instance; }, []);
   const saveScene = async () => {
     try {
-      setStatus('Exporting a faithful PNG preview…');
+      setStatus('Exporting a faithful diagram preview…');
       const snapshot = sceneRef.current;
       const persistedScene = JSON.parse(serializeAsJSON(snapshot.elements, snapshot.appState, snapshot.files, 'local'));
       const snapshotFingerprint = documentFingerprint(snapshot.elements, snapshot.files);
@@ -82,28 +108,65 @@ function App() {
       const previewResponse = await fetch(`/api/scene/preview?revision=${saved.revision}`, { method: 'PUT', headers: { 'content-type': 'image/png' }, body: preview });
       if (!previewResponse.ok) throw new Error(`preview HTTP ${previewResponse.status}`);
       revisionRef.current = saved.revision; setSceneRevision(saved.revision); persistedFingerprint.current = snapshotFingerprint;
-      if (documentFingerprint(sceneRef.current.elements, sceneRef.current.files) === snapshotFingerprint) { dirtyRef.current = false; setDirty(false); setConflict(''); setStatus('Saved. Native Excalidraw scene and official PNG preview are authoritative.'); } else { setConflict('Saved an earlier snapshot; a newer local human edit remains unsaved.'); setStatus('Your newer human edit was preserved. Save again when ready.'); }
+      if (documentFingerprint(sceneRef.current.elements, sceneRef.current.files) === snapshotFingerprint) { dirtyRef.current = false; setDirty(false); setConflict(''); setStatus('Saved. The diagram and its preview are up to date.'); }
+      else { setConflict('Saved an earlier snapshot; a newer edit remains unsaved.'); setStatus('Your newer edit was preserved. Save again when ready.'); }
       await refresh();
     } catch (error) { setStatus(`Not saved: ${error.message}`); }
   };
+  const openComposer = (kind = 'message', anchor = null, replyTo = null) => {
+    setComposer({ kind, anchor, replyTo });
+    if (anchor) setSelectionAnchor(null);
+  };
   const selectedComment = async () => {
     if (!selectedElementId) return setStatus('Select a diagram element first.');
-    const text = window.prompt('Proposal or comment on this Excalidraw element', 'I propose…'); if (!text) return;
-    await submit('proposals', { message: text, anchor: { kind: 'diagram', id: selectedElementId, label: sceneRef.current.elements.find((e) => e.id === selectedElementId)?.text || selectedElementId } });
+    const element = sceneRef.current.elements.find((item) => item.id === selectedElementId);
+    openComposer('proposal', { kind: 'diagram', id: selectedElementId, label: element?.text || 'selected diagram element' });
   };
   const selectionComment = async () => {
     if (!selectionAnchor) return setStatus('Select text inside the artifact first.');
-    const text = window.prompt('Comment on selection', 'I notice…'); if (!text) return;
-    await submit('comments', { message: text, anchor: selectionAnchor }); setSelectionAnchor(null); setStatus('Anchored comment queued.');
+    openComposer('comment', selectionAnchor);
+  };
+  const sendComposer = async (event) => {
+    event.preventDefault();
+    if (!message.trim()) return;
+    try {
+      const endpoint = composer.replyTo ? 'replies' : composer.kind === 'proposal' ? 'proposals' : composer.kind === 'comment' ? 'comments' : 'messages';
+      const body = { message, anchor: composer.anchor || undefined, replyTo: composer.replyTo || undefined };
+      await submit(endpoint, body); setMessage(''); setComposer({ kind: 'message', anchor: null, replyTo: null }); setStatus('Added to the conversation.');
+    } catch (error) { setStatus(error.message); }
   };
   if (!scene || !state) return <main className="loading">{status}</main>;
+  const visibleEvents = state.events.filter((event) => event.type !== 'artifact.changed');
+  const composerLabel = composer.replyTo ? 'Reply to this thought' : composer.kind === 'comment' ? 'Comment on the selected passage' : composer.kind === 'proposal' ? 'Make a proposal about the diagram' : 'Add to the conversation';
   return <>
-    <header><h1>Sketchpad <small>exploratory browser collaboration</small></h1><small>artifact r{artifactRevision} · scene r{sceneRevision}</small></header>
-    <main className="layout">
-      <section className="panel artifact"><h2>Idea artifact</h2><iframe key={artifactKey} ref={iframe} sandbox="allow-scripts" src={`/artifact?revision=${artifactRevision}`} title="Isolated idea artifact" /><div className="tools"><button onClick={selectionComment}>Comment on selection</button><span className="status">{selectionAnchor ? `Selected ${selectionAnchor.id}: “${selectionAnchor.quote}”` : 'Select a phrase in the artifact.'}</span></div></section>
-      <section className="panel scene"><h2>Native Excalidraw scene <span className="badge">authoritative</span></h2><div className="editor-shell"><ExcalidrawEditor initialData={initialData.current || scene} onApi={handleExcalidrawApi} onChange={handleChange} /></div><div className="tools"><button className="primary" onClick={saveScene}>Save scene + PNG preview</button><button onClick={selectedComment}>Comment/propose on selection</button><button onClick={() => { const blob = new Blob([JSON.stringify(sceneRef.current, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'workspace.excalidraw'; link.click(); }}>Export .excalidraw</button></div><div className="status">{conflict || status} {dirty && ' · unsaved human edit'}</div></section>
-      <section className="panel conversation"><h2>Conversation</h2><div className="scroll">{state.events.map((event) => <article className={event.type === 'proposal' ? 'proposal' : ''} key={event.id}><b className={`author ${event.author}`}>{escapeText(event.author)}</b> <strong>{escapeText(event.type)}</strong><p>{escapeText(event.message || 'Scene changed')}</p>{event.anchor && <small className="anchor">{escapeText(event.anchor.kind)}:{escapeText(event.anchor.id)} {event.anchor.quote && `“${escapeText(event.anchor.quote)}”`}</small>}<small>event #{event.id}</small></article>)}</div><form onSubmit={async (event) => { event.preventDefault(); if (!message.trim()) return; await submit('messages', { message }); setMessage(''); }}><textarea value={message} onChange={(event) => setMessage(event.target.value)} placeholder="Question, example, or uncertainty…" /><button className="primary">Send message</button></form></section>
-      <section className="panel comments"><h2>Anchored comments</h2><div className="scroll">{state.comments.length ? state.comments.map((comment) => <article className={comment.proposal ? 'proposal' : ''} key={comment.id}><b className={`author ${comment.author}`}>{escapeText(comment.author)}</b>{comment.proposal && ' proposal'}<p>{escapeText(comment.message)}</p>{comment.anchor && <small className="anchor">{escapeText(comment.anchor.kind)}:{escapeText(comment.anchor.id)} {comment.anchor.quote && `“${escapeText(comment.anchor.quote)}”`}</small>}</article>) : <span className="status">No comments yet.</span>}</div></section>
+    <header className="topbar">
+      <div className="brand"><div className="brand-mark" aria-hidden="true">✦</div><div><h1>Sketchpad</h1><p>A calm space for questions, sketches, and useful disagreement.</p></div></div>
+      <div className="workspace-state"><span className="live-dot" />Local workspace</div>
+    </header>
+    <main className="workspace">
+      <section className="reading-column">
+        <div className="section-heading"><div><p className="kicker">Working canvas</p><h2>Make the question visible</h2></div><span className="revision">Draft {artifactRevision + 1}</span></div>
+        <div className="artifact-card"><iframe key={artifactKey} ref={iframe} src={`/artifact?revision=${artifactRevision}`} title="Working idea canvas" /></div>
+        <div className="artifact-actions"><button className="secondary" onClick={selectionComment}>Comment on selected passage</button><span className="selection-note">{selectionAnchor ? `Selected: ${anchorText(selectionAnchor)}` : 'Select a phrase above to leave an anchored note.'}</span></div>
+      </section>
+      <aside className="discussion-column">
+        <div className="section-heading discussion-heading"><div><p className="kicker">Think together</p><h2>Conversation</h2></div><span className="count">{visibleEvents.length}</span></div>
+        <div className="conversation-list">{visibleEvents.length ? visibleEvents.map((event) => <article className={`thought ${event.type === 'proposal' ? 'is-proposal' : ''}`} key={event.id}>
+          <div className="thought-meta"><span className={`author ${event.author}`}>{humanAuthor(event.author)}</span><span className="thought-type">{humanType(event.type)}</span><span className="thought-time">{event.replyTo ? 'in reply' : ''}</span></div>
+          <div className="thought-body">{event.type === 'scene.changed' ? 'The diagram was saved.' : messageContent(event.message || '')}</div>
+          {event.anchor && <div className="anchor-chip"><span aria-hidden="true">↳</span> {anchorText(event.anchor)}</div>}
+          <button className="reply-link" onClick={() => openComposer('message', null, event.id)}>Reply</button>
+        </article>) : <div className="empty-state"><div className="empty-icon">◌</div><strong>Nothing decided yet</strong><p>Bring a question, observation, or small alternative here. The useful thread starts with you.</p></div>}</div>
+        <form className="composer" onSubmit={sendComposer}>
+          {(composer.anchor || composer.replyTo) && <div className="composer-context"><span>{composerLabel}</span><button type="button" className="dismiss" onClick={() => setComposer({ kind: 'message', anchor: null, replyTo: null })} aria-label="Cancel context">×</button>{composer.anchor && <small>{anchorText(composer.anchor)}</small>}</div>}
+          <textarea ref={composerRef} value={message} onChange={(event) => setMessage(event.target.value)} placeholder={composerLabel + '…'} aria-label={composerLabel} />
+          <div className="composer-footer"><span className="hint">Enter your perspective; suggestions stay proposals.</span><button className="primary" disabled={!message.trim()}>Send</button></div>
+        </form>
+      </aside>
+      <section className={`diagram-section ${sceneOpen ? 'is-open' : ''}`}>
+        <div className="diagram-summary"><div><p className="kicker">Optional, editable</p><h2>Diagram <span className="source-pill">saved with the workspace</span></h2><p>Use a native canvas when a picture clarifies the conversation. It is not required.</p></div><button className="secondary open-diagram" onClick={() => setSceneOpen((open) => !open)}>{sceneOpen ? 'Close editor' : 'Open diagram editor'} <span aria-hidden="true">{sceneOpen ? '↑' : '↓'}</span></button></div>
+        {sceneOpen && <div className="diagram-editor-wrap"><div className="editor-shell"><ExcalidrawEditor initialData={initialData.current || scene} onApi={handleExcalidrawApi} onChange={handleChange} /></div><div className="diagram-tools"><button className="primary" onClick={saveScene}>Save diagram + preview</button><button className="secondary" onClick={selectedComment}>Propose on selected element</button><button className="secondary" onClick={() => { const blob = new Blob([JSON.stringify(sceneRef.current, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'workspace.excalidraw'; link.click(); }}>Export diagram</button><span className="save-status">{conflict || status} {dirty && ' · unsaved edit'}</span></div></div>}
+      </section>
     </main>
   </>;
 }
