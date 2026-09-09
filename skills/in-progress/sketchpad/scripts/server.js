@@ -23,14 +23,14 @@ const initialScene = () => ({
 });
 
 function safeDataDir(dir) { return path.resolve(dir); }
-function initialState() { return { revision: 0, sceneRevision: 0, artifactRevision: 0, nextEventId: 1, events: [], comments: [], scene: initialScene() }; }
+function initialState() { return { revision: 0, sceneRevision: 0, previewRevision: null, artifactRevision: 0, nextEventId: 1, events: [], comments: [], scene: initialScene() }; }
 async function atomicWrite(file, value) {
   const tmp = `${file}.${process.pid}.${Date.now()}.tmp`;
   await fsp.writeFile(tmp, value, 'utf8');
   await fsp.rename(tmp, file);
 }
 async function readState(data) {
-  try { return JSON.parse(await fsp.readFile(path.join(data, 'state.json'), 'utf8')); }
+  try { const state = JSON.parse(await fsp.readFile(path.join(data, 'state.json'), 'utf8')); state.previewRevision ??= null; return state; }
   catch (e) { if (e.code !== 'ENOENT') throw e; const state = initialState(); await atomicWrite(path.join(data, 'state.json'), JSON.stringify(state, null, 2)); return state; }
 }
 async function initData(data) {
@@ -58,6 +58,8 @@ function anchor(body) {
 function json(res, status, value) { const body = JSON.stringify(value); res.writeHead(status, { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', 'content-length': Buffer.byteLength(body) }); res.end(body); }
 function error(res, status, message) { json(res, status, { error: message }); }
 async function body(req) {
+  const contentType = (req.headers['content-type'] || '').split(';', 1)[0].toLowerCase();
+  if (contentType !== 'application/json') { const e = new Error('JSON mutation requires application/json'); e.status = 415; throw e; }
   let total = 0; const chunks = [];
   for await (const chunk of req) { total += chunk.length; if (total > MAX_BODY) throw new Error('request body too large'); chunks.push(chunk); }
   if (!chunks.length) return {};
@@ -73,7 +75,11 @@ function event(state, type, author, payload, replyTo = null) {
   state.events.push(item); state.revision++;
   return item;
 }
-function pending(state, after) { return state.events.filter(e => e.id > after && !e.acknowledged); }
+function revision(value, field = 'revision') { if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < 0) { const e = new Error(`${field} must be a non-negative integer`); e.status = 400; throw e; } return value; }
+function pending(state) { return state.events.filter(e => !e.acknowledged && e.author === 'human'); }
+function loopbackHost(req, server) { try { const value = req.headers.host; if (!value || /[@/]/.test(value)) return false; const parsed = new URL(`http://${value}`); const port = parsed.port ? Number(parsed.port) : 80; return !parsed.username && !parsed.password && parsed.pathname === '/' && ['127.0.0.1', 'localhost'].includes(parsed.hostname) && port === server.address().port; } catch { return false; } }
+function validOrigin(req, server) { const origin = req.headers.origin; if (!origin) return true; if (origin === 'null') return false; try { const parsed = new URL(origin); const requestHost = new URL(`http://${req.headers.host}`); const port = parsed.port ? Number(parsed.port) : 80; return parsed.protocol === 'http:' && parsed.hostname === requestHost.hostname && ['127.0.0.1', 'localhost'].includes(parsed.hostname) && port === server.address().port && parsed.pathname === '/' && !parsed.username && !parsed.password; } catch { return false; } }
+function validPng(bytes) { return bytes.length >= 8 && Buffer.from([137,80,78,71,13,10,26,10]).equals(bytes.subarray(0, 8)); }
 function compactScene(scene, sceneRevision) {
   return { revision: sceneRevision, elements: (scene.elements || []).filter(e => !e.isDeleted).map(e => ({ id: e.id, type: e.type, label: e.text || null, x: Math.round(e.x || 0), y: Math.round(e.y || 0), width: Math.round(e.width || 0), height: Math.round(e.height || 0), bindings: [e.startBinding?.elementId, e.endBinding?.elementId].filter(Boolean) })) };
 }
@@ -101,23 +107,25 @@ async function createServer({ data, port = 4317, host = '127.0.0.1' }) {
   async function route(req, res) {
     const url = new URL(req.url, `http://${host}`); const method = req.method;
     try {
+      if (!loopbackHost(req, server)) return error(res, 403, 'strict loopback Host required');
+      if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method) && !validOrigin(req, server)) return error(res, 403, 'foreign or null Origin rejected');
       if (method === 'GET' && url.pathname === '/') return staticFile(res, path.join(DEMO, 'index.html'), 'text/html; charset=utf-8');
       if (method === 'GET' && url.pathname.startsWith('/assets/')) { const root=path.resolve(DEMO, 'assets'); const asset=path.resolve(root, decodeURIComponent(url.pathname.slice('/assets/'.length))); if (!asset.startsWith(root + path.sep)) return error(res, 404, 'not found'); return staticFile(res, asset, mimeType(asset)); }
       if (method === 'GET' && url.pathname === '/artifact') return staticFile(res, path.join(data, 'artifact.html'), 'text/html; charset=utf-8', true);
       if (method === 'GET' && url.pathname === '/artifact-defaults.css') return staticFile(res, path.join(DEMO, 'artifact-defaults.css'), 'text/css; charset=utf-8', true);
       if (method === 'GET' && url.pathname === '/api/state') {
-        const s = await readState(data); return json(res, 200, { revision: s.revision, scene: compactScene(s.scene, s.sceneRevision), artifactRevision: s.artifactRevision, comments: s.comments, events: s.events.map(({ acknowledged, ...e }) => e) });
+        const s = await readState(data); return json(res, 200, { revision: s.revision, scene: { ...compactScene(s.scene, s.sceneRevision), previewAvailable: s.previewRevision === s.sceneRevision }, artifactRevision: s.artifactRevision, comments: s.comments, events: s.events.map(({ acknowledged, ...e }) => e) });
       }
       if (method === 'GET' && url.pathname === '/api/events') {
-        const after = Number(url.searchParams.get('after') || 0); const timeout = Math.min(Math.max(Number(url.searchParams.get('wait') || 0), 0), 30000);
-        if (!Number.isInteger(after) || after < 0) return error(res, 400, 'after must be a non-negative integer');
-        const get = async () => pending(await readState(data), after);
+        const afterRaw = url.searchParams.get('after'); const timeoutRaw = url.searchParams.get('wait'); const timeout = Math.min(Math.max(Number(timeoutRaw || 0), 0), 30000);
+        if (afterRaw != null && afterRaw !== '' && (!/^(0|[1-9][0-9]*)$/.test(afterRaw) || !Number.isSafeInteger(Number(afterRaw)))) return error(res, 400, 'after must be a non-negative integer');
+        const get = async () => pending(await readState(data));
         let found = await get();
         if (!found.length && timeout) await new Promise(resolve => { const timer = setTimeout(() => { waiters.delete(wake); resolve(); }, timeout); const wake = () => { clearTimeout(timer); waiters.delete(wake); resolve(); }; waiters.add(wake); });
         found = await get(); return json(res, 200, { events: found.slice(0, 20) });
       }
       if (method === 'POST' && url.pathname === '/api/ack') {
-        const b = await body(req); const id = Number(b.id); if (!Number.isInteger(id)) return error(res, 400, 'id must be an integer');
+        const b = await body(req); const id = revision(b.id, 'id');
         const result = await mutate(s => { const e = s.events.find(x => x.id === id); if (!e) throw new Error('event not found'); e.acknowledged = true; return e; }); return json(res, 200, { acknowledged: result.id });
       }
       if (method === 'POST' && ['/api/messages', '/api/comments', '/api/proposals', '/api/replies'].includes(url.pathname)) {
@@ -131,26 +139,26 @@ async function createServer({ data, port = 4317, host = '127.0.0.1' }) {
       }
       if (method === 'GET' && url.pathname === '/api/scene') { const s = await readState(data); return json(res, 200, { revision: s.sceneRevision, scene: s.scene }); }
       if (method === 'GET' && url.pathname === '/api/scene/preview.svg') { const s = await readState(data); const preview=scenePreview(s.scene); res.writeHead(200, { 'content-type':'image/svg+xml; charset=utf-8', 'cache-control':'no-store' }); return res.end(preview); }
-      if (method === 'GET' && url.pathname === '/api/scene/preview.png') return staticFile(res, path.join(data, 'scene-preview.png'), 'image/png', true);
+      if (method === 'GET' && url.pathname === '/api/scene/preview.png') { const s = await readState(data); if (s.previewRevision !== s.sceneRevision) return error(res, 404, 'current scene has no PNG preview'); return staticFile(res, path.join(data, 'scene-preview.png'), 'image/png', true); }
       if (method === 'PUT' && url.pathname === '/api/scene/preview') {
-        const revision=Number(url.searchParams.get('revision')); const bytes=await binaryBody(req); if (req.headers['content-type'] !== 'image/png') return error(res, 415, 'preview must be image/png');
-        await mutate(async s => { if (revision !== s.sceneRevision) { const e=new Error(`stale preview revision: expected ${s.sceneRevision}, got ${revision}`); e.status=409; throw e; } await atomicWrite(path.join(data, 'scene-preview.png'), bytes); return s.sceneRevision; }); return json(res, 200, { revision });
+        const revisionRaw=url.searchParams.get('revision'); if (!/^(0|[1-9][0-9]*)$/.test(revisionRaw || '') || !Number.isSafeInteger(Number(revisionRaw))) return error(res, 400, 'revision must be a non-negative integer'); const revision=Number(revisionRaw); if ((req.headers['content-type'] || '').split(';', 1)[0].toLowerCase() !== 'image/png') return error(res, 415, 'preview must be image/png'); const bytes=await binaryBody(req); if (!validPng(bytes)) return error(res, 400, 'preview is not a PNG');
+        await mutate(async s => { if (revision !== s.sceneRevision) { const e=new Error(`stale preview revision: expected ${s.sceneRevision}, got ${revision}`); e.status=409; throw e; } await atomicWrite(path.join(data, 'scene-preview.png'), bytes); s.previewRevision=revision; return s.sceneRevision; }); return json(res, 200, { revision });
       }
       if (method === 'PUT' && url.pathname === '/api/scene') {
-        const b = await body(req); const base = Number(b.baseRevision); if (!Number.isInteger(base)) return error(res, 400, 'baseRevision is required');
-        const result = await mutate(async s => { if (base !== s.sceneRevision) { const e = new Error(`stale scene revision: expected ${s.sceneRevision}, got ${base}`); e.status = 409; throw e; } if (!b.scene || b.scene.type !== 'excalidraw' || !Array.isArray(b.scene.elements)) throw new Error('scene must be Excalidraw JSON with elements'); s.scene = b.scene; s.sceneRevision++; const e = event(s, 'scene.changed', 'human', { sceneRevision: s.sceneRevision, scene: compactScene(s.scene, s.sceneRevision) }); await atomicWrite(path.join(data, 'scene.excalidraw'), JSON.stringify(s.scene, null, 2)); return { revision: s.sceneRevision, event: e }; });
+        const b = await body(req); const base = revision(b.baseRevision, 'baseRevision');
+        const result = await mutate(async s => { if (base !== s.sceneRevision) { const e = new Error(`stale scene revision: expected ${s.sceneRevision}, got ${base}`); e.status = 409; throw e; } if (!b.scene || b.scene.type !== 'excalidraw' || !Array.isArray(b.scene.elements)) throw new Error('scene must be Excalidraw JSON with elements'); s.scene = b.scene; s.sceneRevision++; s.previewRevision = null; const e = event(s, 'scene.changed', b.author === 'agent' ? 'agent' : 'human', { sceneRevision: s.sceneRevision, scene: compactScene(s.scene, s.sceneRevision) }); await atomicWrite(path.join(data, 'scene.excalidraw'), JSON.stringify(s.scene, null, 2)); return { revision: s.sceneRevision, event: e }; });
         return json(res, 200, result);
       }
       if (method === 'PUT' && url.pathname === '/api/artifact') {
-        const b = await body(req); const base = Number(b.baseRevision); if (!Number.isInteger(base)) return error(res, 400, 'baseRevision is required'); const html = cleanText(b.html, 'html');
+        const b = await body(req); const base = revision(b.baseRevision, 'baseRevision'); const html = cleanText(b.html, 'html');
         const result = await mutate(async s => { if (base !== s.artifactRevision) { const e = new Error(`stale artifact revision: expected ${s.artifactRevision}, got ${base}`); e.status = 409; throw e; } await atomicWrite(path.join(data, 'artifact.html'), html); s.artifactRevision++; return event(s, 'artifact.changed', 'agent', { artifactRevision: s.artifactRevision }); });
         return json(res, 200, { revision: result.artifactRevision });
       }
       return error(res, 404, 'not found');
     } catch (e) { return error(res, e.status || (e instanceof SyntaxError ? 400 : 422), e.message); }
   }
-  const server = http.createServer((req, res) => { if (req.headers.host && !req.headers.host.startsWith('127.0.0.1') && !req.headers.host.startsWith('localhost')) return error(res, 403, 'localhost only'); route(req, res); });
-  await new Promise(resolve => server.listen(port, host, resolve));
+  const server = http.createServer((req, res) => { route(req, res); });
+  await new Promise(resolve => server.listen(port, '127.0.0.1', resolve));
   return { server, data, address: server.address() };
 }
 function mimeType(file) { return { '.js':'text/javascript; charset=utf-8', '.css':'text/css; charset=utf-8', '.woff2':'font/woff2', '.png':'image/png', '.svg':'image/svg+xml' }[path.extname(file)] || 'application/octet-stream'; }
