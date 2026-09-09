@@ -58,6 +58,7 @@ function App() {
   const persistedFingerprint = useRef('');
   const editorInitialized = useRef(false);
   const composerRef = useRef(null);
+  const discussionRef = useRef(null);
 
   const refresh = async () => {
     try {
@@ -149,7 +150,7 @@ function App() {
         <div className="artifact-card"><iframe key={artifactKey} ref={iframe} src={`/artifact?revision=${artifactRevision}`} title="Working idea canvas" /></div>
         <div className="artifact-actions"><button className="secondary" onClick={selectionComment}>Comment on selected passage</button><span className="selection-note">{selectionAnchor ? `Selected: ${anchorText(selectionAnchor)}` : 'Select a phrase above to leave an anchored note.'}</span></div>
       </section>
-      <aside className="discussion-column">
+      <aside className="discussion-column" ref={discussionRef}>
         <div className="section-heading discussion-heading"><div><p className="kicker">Think together</p><h2>Conversation</h2></div><span className="count">{visibleEvents.length}</span></div>
         <div className="conversation-list">{visibleEvents.length ? visibleEvents.map((event) => <article className={`thought ${event.type === 'proposal' ? 'is-proposal' : ''}`} key={event.id}>
           <div className="thought-meta"><span className={`author ${event.author}`}>{humanAuthor(event.author)}</span><span className="thought-type">{humanType(event.type)}</span><span className="thought-time">{event.replyTo ? 'in reply' : ''}</span></div>
@@ -167,6 +168,7 @@ function App() {
         <div className="diagram-summary"><div><p className="kicker">Optional, editable</p><h2>Diagram <span className="source-pill">saved with the workspace</span></h2><p>Use a native canvas when a picture clarifies the conversation. It is not required.</p></div><button className="secondary open-diagram" onClick={() => setSceneOpen((open) => !open)}>{sceneOpen ? 'Close editor' : 'Open diagram editor'} <span aria-hidden="true">{sceneOpen ? '↑' : '↓'}</span></button></div>
         {sceneOpen && <div className="diagram-editor-wrap"><div className="editor-shell"><ExcalidrawEditor initialData={initialData.current || scene} onApi={handleExcalidrawApi} onChange={handleChange} /></div><div className="diagram-tools"><button className="primary" onClick={saveScene}>Save diagram + preview</button><button className="secondary" onClick={selectedComment}>Propose on selected element</button><button className="secondary" onClick={() => { const blob = new Blob([JSON.stringify(sceneRef.current, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'workspace.excalidraw'; link.click(); }}>Export diagram</button><span className="save-status">{conflict || status} {dirty && ' · unsaved edit'}</span></div></div>}
       </section>
+      <button className="mobile-discuss" onClick={() => { discussionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); setTimeout(() => composerRef.current?.focus(), 350); }}>Discuss <span aria-hidden="true">↓</span></button>
     </main>
   </>;
 }

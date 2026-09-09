@@ -14,7 +14,7 @@ async function raw(url, options) { return new Promise((resolve,reject) => { cons
 test('serves isolated app and artifact but no arbitrary filesystem path', async t => {
   const f=await fixture(); t.after(f.close);
   assert.equal((await fetch(f.url+'/')).status,200); const app=await fetch(f.url+'/'); assert.match(await app.text(),/Sketchpad/); assert.equal((await fetch(f.url+'/artifact-defaults.css')).status,200);
-  assert.match(await (await fetch(f.url+'/artifact')).text(),/Self-referential demo/);
+  assert.match(await (await fetch(f.url+'/artifact')).text(),/When does disagreement help us think/);
   assert.equal((await fetch(f.url+'/../state.json')).status,404);
   assert.equal((await fetch(f.url+'/%2e%2e/%2e%2e/etc/passwd')).status,404);
   const artifactHeaders=await fetch(f.url+'/artifact'); assert.match(artifactHeaders.headers.get('content-security-policy'),/default-src 'none'/);
