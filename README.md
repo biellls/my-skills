@@ -110,6 +110,16 @@ Everything is plain markdown — edit `docs/agents/*.md` directly afterwards. Re
 
 ## Skill index
 
+### In progress ([`skills/in-progress`](./skills/in-progress/README.md))
+
+Runnable prototypes and experiments not yet promoted to a daily bucket.
+
+#### Model-invoked
+
+| Skill | Use it to |
+| --- | --- |
+| [`sketchpad`](./skills/in-progress/sketchpad/SKILL.md) | Explore an idea in a local browser workspace with anchored human/agent comments and a durable CLI wait/reply loop. |
+
 ### Engineering ([`skills/engineering`](./skills/engineering/README.md))
 
 Daily code work: shaping, publishing, implementation, architecture, review, debugging, research, and delivery.

@@ -1,0 +1,21 @@
+<!doctype html>
+<meta charset="utf-8">
+<link rel="stylesheet" href="/artifact-defaults.css">
+<main>
+  <p class="eyebrow">Self-referential demo · a hypothesis, not a spec</p>
+  <h1 id="idea-question">Can a sketch make an agent's disagreement useful?</h1>
+  <div class="comparison"><div><strong>Human supplies</strong><br>intent, taste, judgment</div><div><strong>Agent supplies</strong><br>examples, alternatives, consequences</div></div>
+  <p id="idea-context">This browser workspace puts a concrete idea beside a native scene. A human can select this sentence, leave an anchored comment, and keep talking while the existing Claude Code session waits in its terminal.</p>
+  <blockquote class="callout" id="idea-loop">The small loop is: wait → receive → inspect → act → reply. A proposal is a hypothesis, never a silent mutation.</blockquote>
+  <div class="caveat" id="idea-caveat"><strong>Material caveat:</strong> a stopped agent cannot be awakened by localhost polling, and terminal permissions still apply. The browser is not a second brain.</div>
+</main>
+<script>
+  function reportSelection() {
+    const selection = window.getSelection();
+    const quote = selection && selection.toString().trim();
+    const node = selection && selection.anchorNode && selection.anchorNode.parentElement?.closest('[id]');
+    if (quote && node) parent.postMessage({ type: 'sketchpad-selection', anchor: { kind: 'html', id: node.id, quote } }, '*');
+  }
+  document.addEventListener('mouseup', reportSelection);
+  document.addEventListener('keyup', reportSelection);
+</script>
