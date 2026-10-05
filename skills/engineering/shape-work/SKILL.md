@@ -14,6 +14,8 @@ Read `docs/agents/altitudes.md` first — it defines the four altitudes (intent,
 
 Shape in the conversation unless the work requires modifying `CONTEXT.md` or ADRs. Before the first such edit, fetch `origin`, identify the repository's remote default branch (`origin/main` when that is the default), and create a dedicated branch in a separate git worktree from the latest `origin/<default-branch>`. Do not base it on a stale local branch.
 
+If the input is a cleared `/wayfinder` map whose Notes name a **Map branch**, that branch is the shaping branch: create the worktree from the latest remote map branch, bring it up to date with `origin/<default-branch>` per the repo's merge or rebase convention, and carry it to handoff even if shaping adds no further file changes.
+
 Make all domain-document changes in that worktree and commit them before handoff. Preserve the branch name in the aligned output so `/to-tickets` can push and reference it. Do not create a branch or worktree when shaping produces no file changes.
 
 ## Pick the mode

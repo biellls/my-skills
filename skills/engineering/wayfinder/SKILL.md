@@ -37,6 +37,8 @@ The whole map at low resolution, loaded once per session. Open tickets are **not
 
 <domain; skills every session should consult; standing preferences for this effort>
 
+<!-- Map branch: `wayfinder/<map-slug>` — added once a session first changes CONTEXT.md or ADRs; see "Branches and worktrees" -->
+
 ## Decisions so far
 
 <!-- the index — one line per closed ticket: enough to judge relevance, then zoom the link for the detail the ticket holds -->
@@ -69,6 +71,15 @@ A session **claims** a ticket by assigning it to the dev driving the map, **firs
 Blocking uses the tracker's **native** dependency relationship — essential because it renders the frontier _visually_ in the tracker's own UI, so the human sees what's takeable without opening the map. Only a tracker that lacks native blocking falls back to a body convention. A ticket is **unblocked** when every ticket blocking it is closed; the **frontier** is the open, unblocked, unclaimed children — the edge of the known.
 
 The answer isn't part of the body — it's recorded on resolution (see [Work through the map](#work-through-the-map)). Assets created while resolving a ticket are linked from the issue, not pasted in.
+
+## Branches and worktrees
+
+The map lives on the tracker; file changes never land in the primary checkout. Every session that writes files does so in its own git worktree. Before creating one, fetch `origin` and identify the repository's remote default branch (`origin/main` when that is the default); do not base anything on a stale local branch.
+
+- **The map branch.** Decisions that modify `CONTEXT.md` or ADRs (usually via `/domain-modeling`) accumulate on one branch per map, `wayfinder/<map-slug>`. The first session that needs such an edit creates it from the latest `origin/<default-branch>`, pushes it with an upstream, and records it in the map's **Notes** as the effort's **Map branch**. Later sessions create their worktree from the latest remote map branch, bring it up to date with `origin/<default-branch>` per the repo's merge or rebase convention, commit, and push before recording the resolution — sessions run in parallel, so an unpushed map branch is invisible to them. If the push is rejected, integrate the remote map branch and retry; never force-push it. Do not create the map branch when no session has produced domain-document changes.
+- **Throwaway branches.** Research findings and prototypes are primary sources, not decisions: each goes on its own `research/<name>` or `prototype/<name>` branch, in its own worktree, created from the latest remote map branch if one exists or else from `origin/<default-branch>`. Push it and link it from the ticket. These branches never merge into the map branch; only the decision they settled does, if it touches domain docs.
+
+When the map is cleared, the map branch is the handoff: `/shape-work` starts from it, so the domain-document changes reach `/to-tickets` and `/implement` as their **Starting branch**.
 
 ## Ticket Types
 
@@ -112,7 +123,7 @@ User invokes with a loose idea.
 2. **Map the frontier.** Grill again, **breadth-first** this time: fan out across the whole space rather than deep on any one thread, surfacing the open decisions and the first steps takeable now. **If this surfaces no fog** — the way to the destination is already clear, the whole journey small enough for one session — you don't need a map. Stop and ask the user how they'd like to proceed.
 3. **Create the map** (label `wayfinder:map`): Destination and Notes filled in, Decisions-so-far empty, the fog sketched into **Not yet specified**.
 4. **Create the tickets you can specify now** as child issues of the map — then wire blocking edges in a **second pass** (issues need ids before they can reference each other). Wiring sorts them into the frontier and the blocked; everything you can't yet specify stays in the fog — the **Not yet specified** section.
-5. **Fire the research subagents.** For each `research` ticket you just created, spin up a `/research` subagent to resolve it in parallel, capturing its findings on a throwaway `research/<name>` branch with a context pointer from the ticket.
+5. **Fire the research subagents.** For each `research` ticket you just created, spin up a `/research` subagent to resolve it in parallel, capturing its findings on a throwaway `research/<name>` branch in its own worktree (see [Branches and worktrees](#branches-and-worktrees)) with a context pointer from the ticket.
 6. Stop — charting is one session's work; it hand-resolves nothing.
 
 ### Work through the map
@@ -121,8 +132,8 @@ User invokes with a map (URL or number). A ticket is **optional** — without on
 
 1. Load the **map** — the low-res view, not every ticket body.
 2. Choose the ticket. If the user named one, use it. Otherwise take the first frontier ticket in order. **Claim it**: assign it to yourself before any work.
-3. Resolve it — **zoom as needed**: fetch the full body of any related or closed ticket on demand; invoke the skills the `## Notes` block names. If in doubt, use `/grilling` and `/domain-modeling`.
-4. Record the resolution: post the answer as a **resolution comment**, **close** the issue, and **append a context pointer** to the map's Decisions-so-far.
+3. Resolve it — **zoom as needed**: fetch the full body of any related or closed ticket on demand; invoke the skills the `## Notes` block names. If in doubt, use `/grilling` and `/domain-modeling`. Make any file changes in a worktree per [Branches and worktrees](#branches-and-worktrees).
+4. Record the resolution: commit and push any domain-document changes to the map branch, post the answer as a **resolution comment** (naming the commit when there is one), **close** the issue, and **append a context pointer** to the map's Decisions-so-far.
 5. Add newly-surfaced tickets (create-then-wire); graduate any fog the answer has made specifiable, clearing each graduated patch from **Not yet specified** so it lives only as its new ticket. If the answer reveals a ticket — this one or another — sits beyond the destination, **rule it out of scope** rather than resolving it on the route. If the decision invalidates other parts of the map, update or delete those tickets.
 
 The user may run unblocked tickets in parallel, so expect other sessions to be editing the tracker concurrently.
