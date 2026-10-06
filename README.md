@@ -137,6 +137,7 @@ Reachable only when explicitly requested.
 | [`improve-codebase-architecture`](./skills/engineering/improve-codebase-architecture/SKILL.md) | Scan a codebase for deepening opportunities, present them as a visual HTML report, then grill through your pick. |
 | [`triage`](./skills/engineering/triage/SKILL.md) | Move Issues (and optionally external PRs) through a state machine of triage roles. |
 | [`setup-skills`](./skills/engineering/setup-skills/SKILL.md) | Configure a repo for these engineering skills: issue tracker, triage labels, project lifecycle, altitudes, and domain docs. Run once per repo. |
+| [`uat`](./skills/engineering/uat/SKILL.md) | Bring the app up with the feature just built, seeded and with any files in `~/Downloads`, plus a short plan of what to open and test by hand. |
 
 #### Model-invoked
 

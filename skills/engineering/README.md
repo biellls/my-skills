@@ -13,6 +13,7 @@ Reachable only when you type them (Claude Code: `disable-model-invocation: true`
 - **[to-tickets](./to-tickets/SKILL.md)** — Publish work that `/shape-work` has already aligned to the tracker — Issues at intent, a functional Issue, an Issue + spec, or an Issue + spec + Sub-issue slices — reading the house-shape and issue-tracker docs. No interview.
 - **[implement](./implement/SKILL.md)** — Build the work described by a spec or set of tickets, driving `/tdd` at pre-agreed seams and closing out with `/code-review` before committing.
 - **[wayfinder](./wayfinder/SKILL.md)** — Plan a huge chunk of work — more than one agent session can hold — as a shared map of decision tickets on the issue tracker, resolved one at a time until the way to the destination is clear.
+- **[uat](./uat/SKILL.md)** — Bring the app up with the feature just built — seeded data, files in `~/Downloads`, and a short test plan of links to open — so you can test it by hand.
 
 ## Model-invoked
 

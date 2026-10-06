@@ -1,0 +1,5 @@
+interface:
+  display_name: "UAT"
+  short_description: "Bring the app up to test the new feature"
+policy:
+  allow_implicit_invocation: false
