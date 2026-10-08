@@ -11,7 +11,11 @@ Bucket `README.md`s and the top-level `README.md` group entries into **User-invo
 
 ## Dependencies between them
 
-Dependencies are expressed as **`/skill`-style prose invocation** ("Run the `/grilling` skill"), not deep `../other-skill/FILE.md` cross-references. Shared reference docs live inside the skill that owns them; other skills reach that material by invoking the skill, not by linking across folders.
+When a skill needs another skill, tell the agent to **load** it: "Load the `grilling` skill." Every step that needs the skill says to load it, even if an earlier step already did; don't assume an earlier load happened. A `/grilling` mention in passing reads as a label, and agents often skip it. Don't name a harness mechanism (Skill tool, `/skill:name`, file paths): each harness knows how to load skills its own way.
+
+A user-invoked skill can't be loaded by another skill. Tell the user to run it instead: "recommend the user run `/improve-codebase-architecture`". Mentions that just name another skill without asking the agent to run it (hand-off notes, READMEs) keep `/name` as a plain label.
+
+Don't use deep `../other-skill/FILE.md` cross-references either. Shared reference docs live inside the skill that owns them; other skills reach that material by loading the skill, not by linking across folders.
 
 ## Passive vs active domain work
 

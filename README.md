@@ -88,6 +88,8 @@ npx skills@latest add biellls/my-skills -g
 
 `npx skills list` shows what's installed; `npx skills update` pulls the latest; `npx skills rm biellls/my-skills` removes it.
 
+> **Claude Code: `code-review` name clash.** Claude Code ships its own built-in `/code-review`, which can shadow this repo's `code-review` skill — including when `/implement` loads it to review the work. Set `"disableBundledSkills": true` in `~/.claude/settings.json` to turn off the built-in skills so this one wins. That disables all of Claude Code's bundled skills, not just `/code-review`. Other harnesses (e.g. pi) have no built-in by that name.
+
 ### 2. Set up each repo you use them in
 
 The engineering skills assume a small amount of per-repo configuration — which issue tracker to use, the triage label vocabulary, the project's development stage, the domain-doc layout, and the planning altitudes. Run **once per repo**:

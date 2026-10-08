@@ -16,7 +16,7 @@ Each skill is a folder containing a `SKILL.md` plus any reference docs, scripts,
 - Every skill in a bucket has an entry in that bucket's `README.md`, with the skill name linked to its `SKILL.md`. Bucket READMEs group entries into **User-invoked** and **Model-invoked**.
 - Every skill also has a reference in the top-level `README.md`, grouped the same way.
 - Every `SKILL.md` is either **user-invoked** (`disable-model-invocation: true`, reachable only by the human) or **model-invoked** (model- or user-reachable). See [.agents/invocation.md](./.agents/invocation.md) for how this shapes the `description` field and cross-skill dependencies.
-- Cross-skill dependencies are expressed as `/skill`-style prose invocation ("Run the `/grilling` skill"), not deep `../other-skill/FILE.md` links. Shared reference material lives inside the skill that owns it.
+- Cross-skill dependencies are expressed as an instruction to load the skill ("Load the `grilling` skill"), at every step that needs it, not a passing `/grilling` mention or a deep `../other-skill/FILE.md` link. Shared reference material lives inside the skill that owns it.
 
 ## Installing into the harness
 
