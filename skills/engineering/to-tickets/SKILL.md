@@ -32,4 +32,4 @@ Identify the altitude of the aligned work, confirm it with the user in one line,
 
 ## How to persist
 
-The *what* lives in the house-shape docs; the *how* lives in `docs/agents/issue-tracker.md` — follow it. Publish in dependency order (blockers first) so blocking edges can reference real identifiers. Apply the `ready-for-agent` triage label to agent-grabbable work unless told otherwise. Do NOT close or modify any parent issue. Avoid file paths and code snippets in issue bodies (the prototype-snippet exception aside) — they go stale.
+The *what* lives in the house-shape docs; the *how* lives in `docs/agents/issue-tracker.md` — follow it. Publish in dependency order (blockers first) so blocking edges can reference real identifiers. Apply the `ready-for-agent` triage label to agent-grabbable work unless told otherwise. If the project has sprints configured and the user hasn't said where the tickets go, put every new Issue and Sub-issue in the current sprint. Do NOT close or modify any parent issue. Avoid file paths and code snippets in issue bodies (the prototype-snippet exception aside) — they go stale.
