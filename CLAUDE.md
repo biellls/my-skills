@@ -20,7 +20,7 @@ Each skill is a folder containing a `SKILL.md` plus any reference docs, scripts,
 
 ## Installing into the harness
 
-Skills install from GitHub via the [`skills`](https://skills.sh) CLI: `npx skills@latest add biellls/my-skills` (whole collection) or `npx skills@latest add biellls/my-skills/skills/engineering/<name>` (one skill). Add `--agent claude-code` to target an agent or `-g` for a global install; `npx skills update` pulls later changes. `scripts/list-skills.sh` prints every `SKILL.md` path locally.
+Skills install from GitHub via the [`skills`](https://skills.sh) CLI: `npx skills@latest add biellls/my-skills` (whole collection) or `npx skills@latest add biellls/my-skills/skills/engineering/<name>` (one skill). Add `--agent claude-code` to target an agent or `-g` for a global install; `npx skills update` pulls later changes. `scripts/list-skills.sh` prints every `SKILL.md` path locally. The projects that use these skills are listed in `projects.local.md` (gitignored); when asked to update the skills in our projects, apply the update to each one listed there.
 
 ## Attribution
 
