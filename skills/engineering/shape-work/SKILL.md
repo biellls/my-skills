@@ -8,15 +8,17 @@ disable-model-invocation: true
 
 Grill the user to shape work into agreed form before it's published. This skill **aligns**; it never writes to the tracker. It runs in one of two modes.
 
+**Read current code.** The primary checkout may sit on an old branch far behind `origin`. Before reading any code or docs, fetch `origin` and move into a worktree at the latest `origin/<default-branch>` (or the remote map branch, when a `/wayfinder` map names one). Shape from there.
+
 Read `docs/agents/altitudes.md` first — it defines the four altitudes (intent, functional, technical, implementation slices) and points at their house shapes (`docs/agents/intent.md`, `docs/agents/functional-issues.md`, `docs/agents/technical.md`, `docs/agents/implementation-slices.md`). Everything below stays inside those altitudes. Also read the domain docs per `docs/agents/domain.md` before shaping, so you use the project's vocabulary.
 
 ## Branch domain-document changes
 
-Shape in the conversation unless the work requires modifying `CONTEXT.md` or ADRs. Before the first such edit, fetch `origin`, identify the repository's remote default branch (`origin/main` when that is the default), and create a dedicated branch in a separate git worktree from the latest `origin/<default-branch>`. Do not base it on a stale local branch.
+Shape in the conversation unless the work requires modifying `CONTEXT.md` or ADRs. Before the first such edit, create a dedicated branch in the worktree you're shaping from.
 
-If the input is a cleared `/wayfinder` map whose Notes name a **Map branch**, that branch is the shaping branch: create the worktree from the latest remote map branch, bring it up to date with `origin/<default-branch>` per the repo's merge or rebase convention, and carry it to handoff even if shaping adds no further file changes.
+If the input is a cleared `/wayfinder` map whose Notes name a **Map branch**, that branch is the shaping branch: check it out in that worktree, bring it up to date with `origin/<default-branch>` per the repo's merge or rebase convention, and carry it to handoff even if shaping adds no further file changes.
 
-Make all domain-document changes in that worktree and commit them before handoff. Preserve the branch name in the aligned output so `/to-tickets` can push and reference it. Do not create a branch or worktree when shaping produces no file changes.
+Make all domain-document changes in that worktree and commit them before handoff. Preserve the branch name in the aligned output so `/to-tickets` can push and reference it. Do not create a branch when shaping produces no file changes.
 
 ## Pick the mode
 
