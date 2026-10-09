@@ -140,6 +140,7 @@ Reachable only when explicitly requested.
 | [`triage`](./skills/engineering/triage/SKILL.md) | Move Issues (and optionally external PRs) through a state machine of triage roles. |
 | [`setup-skills`](./skills/engineering/setup-skills/SKILL.md) | Configure a repo for these engineering skills: issue tracker, triage labels, project lifecycle, altitudes, and domain docs. Run once per repo. |
 | [`uat`](./skills/engineering/uat/SKILL.md) | Bring the app up with the feature just built, seeded and with any files in `~/Downloads`, plus a short plan of what to open and test by hand. |
+| [`retro`](./skills/engineering/retro/SKILL.md) | Look back over a coding session and propose environment fixes (navigation pointers, automated checks, coding standards, leaner steering), most severe first. Proposes only. |
 
 #### Model-invoked
 
