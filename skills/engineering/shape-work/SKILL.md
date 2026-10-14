@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 Grill the user to shape work into agreed form before it's published. This skill **aligns**; it never writes to the tracker. It runs in one of two modes.
 
-**Read current code.** The primary checkout may sit on an old branch far behind `origin`. Before reading any code or docs, fetch `origin` and move into a worktree at the latest `origin/<default-branch>` (or the remote map branch, when a `/wayfinder` map names one). Shape from there.
+**Read current code.** The primary checkout may sit on an old branch far behind `origin`. Before reading any code or docs, fetch `origin` and move into a worktree at the latest `origin/<default-branch>` (or the remote map branch, when a `/wayfinder` map names one). Create it with your harness's native worktree tool where one exists, so the repo's worktree setup (such as copied gitignored files) applies. Shape from there.
 
 Read `docs/agents/altitudes.md` first — it defines the four altitudes (intent, functional, technical, implementation slices) and points at their house shapes (`docs/agents/intent.md`, `docs/agents/functional-issues.md`, `docs/agents/technical.md`, `docs/agents/implementation-slices.md`). Everything below stays inside those altitudes. Also read the domain docs per `docs/agents/domain.md` before shaping, so you use the project's vocabulary.
 
