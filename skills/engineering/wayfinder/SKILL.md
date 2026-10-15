@@ -124,7 +124,7 @@ User invokes with a loose idea.
 3. **Create the map** (label `wayfinder:map`): Destination and Notes filled in, Decisions-so-far empty, the fog sketched into **Not yet specified**.
 4. **Create the tickets you can specify now** as child issues of the map — then wire blocking edges in a **second pass** (issues need ids before they can reference each other). Wiring sorts them into the frontier and the blocked; everything you can't yet specify stays in the fog — the **Not yet specified** section.
 5. **Fire the research subagents.** For each `research` ticket you just created, spin up a subagent that loads the `research` skill to resolve it in parallel, capturing its findings on a throwaway `research/<name>` branch in its own worktree (see [Branches and worktrees](#branches-and-worktrees)) with a context pointer from the ticket.
-6. Stop — charting is one session's work; it hand-resolves nothing.
+6. Stop — charting is one session's work; it hand-resolves nothing. Hand off the frontier as in step 6 of [Work through the map](#work-through-the-map).
 
 ### Work through the map
 
@@ -135,5 +135,6 @@ User invokes with a map (URL or number). A ticket is **optional** — without on
 3. Resolve it — **zoom as needed**: fetch the full body of any related or closed ticket on demand; load the skills the `## Notes` block names. If in doubt, load `grilling` and `domain-modeling`. Make any file changes in a worktree per [Branches and worktrees](#branches-and-worktrees).
 4. Record the resolution: commit and push any domain-document changes to the map branch, post the answer as a **resolution comment** (naming the commit when there is one), **close** the issue, and **append a context pointer** to the map's Decisions-so-far.
 5. Add newly-surfaced tickets (create-then-wire); graduate any fog the answer has made specifiable, clearing each graduated patch from **Not yet specified** so it lives only as its new ticket. If the answer reveals a ticket — this one or another — sits beyond the destination, **rule it out of scope** rather than resolving it on the route. If the decision invalidates other parts of the map, update or delete those tickets.
+6. **Hand off the next ticket.** Re-run the frontier query after step 5. End with a "Next up" list of the open, unblocked, unclaimed tickets in map order, recommending the first, each as `#<number> [<title>](<link>) (<type>)`. The number is there so the human can start the next session with `/wayfinder #<number>`. If none are free, say so and list what's blocked or claimed.
 
 The user may run unblocked tickets in parallel, so expect other sessions to be editing the tracker concurrently.
