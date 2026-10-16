@@ -23,7 +23,7 @@ If shaping created no branch, omit the reference; implementation will start from
 
 ## Publish at the altitude the work reached
 
-Identify the altitude of the aligned work, confirm it with the user in one line, then persist. Each altitude includes the ones above it.
+Identify the altitude of the aligned work, state it in one line, then persist. Each altitude includes the ones above it.
 
 - **Intent** — create one or more **Issues** from the Candidate Issues, each with its intent-altitude fields (`docs/agents/intent.md`) and any `blocked-by` edges between them.
 - **Functional** — create one **Issue** carrying the functional description (`docs/agents/functional-issues.md`).
