@@ -1,0 +1,384 @@
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.11"
+# dependencies = ["click>=8.1"]
+# ///
+"""Portable CLI primitives for agent operations.
+
+This intentionally wraps low-level, repeated operations that are easy to get
+wrong by hand: GitHub native Issue fields/types and GitHub Project
+single-select fields.
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import subprocess
+import time
+from pathlib import Path
+from typing import Any
+
+import click
+
+
+OWNER = ""
+REPO = ""
+
+PRIORITY_MAP = {
+    "urgent": "Urgent",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low",
+}
+TYPE_MAP = {
+    "bug": "Bug",
+    "feature": "Feature",
+    "enhancement": "Feature",
+    "task": "Task",
+}
+
+
+def run(args: list[str], *, input_text: str | None = None) -> str:
+    proc = subprocess.run(args, input=input_text, text=True, capture_output=True)
+    if proc.returncode != 0:
+        if proc.stdout:
+            click.echo(proc.stdout, err=True)
+        if proc.stderr:
+            click.echo(proc.stderr, err=True)
+        raise click.ClickException(f"command failed ({proc.returncode}): {' '.join(args)}")
+    return proc.stdout.strip()
+
+
+def run_json(args: list[str]) -> Any:
+    out = run(args)
+    return json.loads(out) if out else None
+
+
+def issue_node_id(number: int) -> str:
+    """Resolve an issue's GraphQL node id over REST, which has its own quota."""
+    return run_json(["gh", "api", f"repos/{OWNER}/{REPO}/issues/{number}", "--jq", "{node_id}"])["node_id"]
+
+
+def repo_graphql(query: str, **fields: Any) -> Any:
+    args = ["gh", "api", "graphql", "-f", f"query={query}"]
+    for key, value in fields.items():
+        flag = "-F" if isinstance(value, int) else "-f"
+        args.extend([flag, f"{key}={value}"])
+    return run_json(args)
+
+
+# --- Metadata cache -------------------------------------------------------
+#
+# Project ids, field ids, and single-select option ids change rarely, but
+# resolving them costs GraphQL quota on every invocation. Cache them beside the
+# git directory (never committed) so a batch of updates pays for the lookup once.
+
+CACHE_TTL_SECONDS = int(os.environ.get("AGENT_TOOLS_CACHE_TTL", 24 * 60 * 60))
+
+
+def cache_path() -> Path | None:
+    try:
+        git_dir = run(["git", "rev-parse", "--git-common-dir"])
+    except click.ClickException:
+        return None
+    return Path(git_dir).resolve() / "agent-tools-cache.json"
+
+
+def cached(key: str, produce, *, refresh: bool = False) -> Any:
+    """Return `produce()`'s value for `key`, reusing a fresh on-disk entry."""
+    path = cache_path()
+    store: dict[str, Any] = {}
+    if path and path.exists():
+        try:
+            store = json.loads(path.read_text())
+        except (OSError, json.JSONDecodeError):
+            store = {}
+    entry = store.get(key)
+    if not refresh and entry and time.time() - entry.get("at", 0) < CACHE_TTL_SECONDS:
+        return entry["value"]
+    value = produce()
+    if path:
+        store[key] = {"at": time.time(), "value": value}
+        try:
+            path.write_text(json.dumps(store, indent=2))
+        except OSError:
+            pass
+    return value
+
+
+PROJECT_METADATA_QUERY = """
+query($owner: String!, $number: Int!) {
+  %s(login: $owner) {
+    projectV2(number: $number) {
+      id
+      fields(first: 50) {
+        nodes {
+          __typename
+          ... on ProjectV2FieldCommon { id name }
+          ... on ProjectV2SingleSelectField { options { id name } }
+        }
+      }
+    }
+  }
+}
+"""
+
+
+def project_metadata(*, refresh: bool = False) -> dict[str, Any]:
+    """Project id plus every field's id, type, and option ids, in one request.
+
+    Replaces a `gh project view` and a `gh project field-list` round trip.
+    """
+
+    project_owner = os.environ.get("AGENT_GITHUB_PROJECT_OWNER")
+    project_number = os.environ.get("AGENT_GITHUB_PROJECT_NUMBER")
+    if not project_owner or not project_number:
+        raise click.ClickException(
+            "set AGENT_GITHUB_PROJECT_OWNER and AGENT_GITHUB_PROJECT_NUMBER "
+            "from the target repository's tracker docs"
+        )
+    if not project_number.isascii() or not project_number.isdecimal() or int(project_number) < 1:
+        raise click.ClickException("AGENT_GITHUB_PROJECT_NUMBER must be a positive integer")
+
+    def fetch() -> dict[str, Any]:
+        last: click.ClickException | None = None
+        for root in ("organization", "user"):
+            try:
+                data = repo_graphql(
+                    PROJECT_METADATA_QUERY % root,
+                    owner=project_owner,
+                    number=int(project_number),
+                )
+            except click.ClickException as exc:  # owner is the other kind
+                last = exc
+                continue
+            project = ((data.get("data") or {}).get(root) or {}).get("projectV2")
+            if project:
+                return {
+                    "id": project["id"],
+                    "fields": {
+                        node["name"]: {
+                            "id": node["id"],
+                            "type": node["__typename"],
+                            "options": {o["name"]: o["id"] for o in node.get("options") or []},
+                        }
+                        for node in project["fields"]["nodes"]
+                        if node.get("name")
+                    },
+                }
+        if last:
+            raise last
+        raise click.ClickException(f"project not found: {project_owner}/{project_number}")
+
+    return cached(f"project:{project_owner}/{project_number}", fetch, refresh=refresh)
+
+
+def project_item_id(project_id: str, number: int) -> str:
+    """Item id for an issue, adding it to the project when absent.
+
+    `addProjectV2ItemById` returns the existing item when the issue is already
+    on the board, so one mutation replaces listing every item to find it.
+    """
+    mutation = """
+    mutation($projectId: ID!, $contentId: ID!) {
+      addProjectV2ItemById(input: {projectId: $projectId, contentId: $contentId}) {
+        item { id }
+      }
+    }
+    """
+    data = repo_graphql(mutation, projectId=project_id, contentId=issue_node_id(number))
+    return data["data"]["addProjectV2ItemById"]["item"]["id"]
+
+
+@click.group()
+def cli() -> None:
+    """GitHub agent helpers. Run from the target repository, not the skill directory."""
+
+
+@cli.group()
+def issue() -> None:
+    """GitHub Issue helpers backed by gh."""
+    global OWNER, REPO
+    owner = os.environ.get("AGENT_GITHUB_OWNER")
+    repo = os.environ.get("AGENT_GITHUB_REPO")
+    if bool(owner) != bool(repo):
+        raise click.ClickException("set both AGENT_GITHUB_OWNER and AGENT_GITHUB_REPO, or neither")
+    if not owner:
+        full_name = run(["gh", "repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner"])
+        owner, repo = full_name.split("/", 1)
+    OWNER, REPO = owner, repo
+
+
+@issue.command("set-type")
+@click.argument("number", type=int)
+@click.argument("issue_type")
+def issue_set_type(number: int, issue_type: str) -> None:
+    """Set native GitHub Issue Type (Feature/Bug/Task)."""
+    desired = TYPE_MAP.get(issue_type.lower(), issue_type)
+    query = """
+    query($owner: String!, $repo: String!) {
+      repository(owner: $owner, name: $repo) {
+        issueTypes(first: 50) { nodes { id name isEnabled } }
+      }
+    }
+    """
+    types = cached(
+        f"issueTypes:{OWNER}/{REPO}",
+        lambda: repo_graphql(query, owner=OWNER, repo=REPO)["data"]["repository"]["issueTypes"]["nodes"],
+    )
+    match = next((t for t in types if t["name"].lower() == desired.lower() and t["isEnabled"]), None)
+    if not match:
+        raise click.ClickException(f"enabled issue type not found: {desired}")
+    mutation = """
+    mutation($issueId: ID!, $issueTypeId: ID!) {
+      updateIssue(input: {id: $issueId, issueTypeId: $issueTypeId}) {
+        issue { number issueType { name } }
+      }
+    }
+    """
+    repo_graphql(mutation, issueId=issue_node_id(number), issueTypeId=match["id"])
+    click.echo(f"#{number}: Type={match['name']}")
+
+
+@issue.command("set-priority")
+@click.argument("number", type=int)
+@click.argument("priority")
+def issue_set_priority(number: int, priority: str) -> None:
+    """Set native GitHub Issue field Priority."""
+    desired = PRIORITY_MAP.get(priority.lower(), priority)
+    query = """
+    query($owner: String!, $repo: String!) {
+      repository(owner: $owner, name: $repo) {
+        issueFields(first: 50) {
+          nodes {
+            __typename
+            ... on IssueFieldSingleSelect { id name options { id name } }
+          }
+        }
+      }
+    }
+    """
+    fields = cached(
+        f"issueFields:{OWNER}/{REPO}",
+        lambda: repo_graphql(query, owner=OWNER, repo=REPO)["data"]["repository"]["issueFields"]["nodes"],
+    )
+    field = next((f for f in fields if f.get("__typename") == "IssueFieldSingleSelect" and f.get("name") == "Priority"), None)
+    if not field:
+        raise click.ClickException("native Issue field 'Priority' not found")
+    option = next((o for o in field["options"] if o["name"].lower() == desired.lower()), None)
+    if not option:
+        raise click.ClickException(f"Priority option not found: {desired}")
+    mutation = """
+    mutation($issueId: ID!, $fieldId: ID!, $optionId: ID!) {
+      setIssueFieldValue(input: { issueId: $issueId, issueFields: [{ fieldId: $fieldId, singleSelectOptionId: $optionId }] }) {
+        clientMutationId
+      }
+    }
+    """
+    repo_graphql(mutation, issueId=issue_node_id(number), fieldId=field["id"], optionId=option["id"])
+    click.echo(f"#{number}: Priority={option['name']}")
+
+
+@issue.command("set-project-field")
+@click.argument("number", type=int)
+@click.argument("pairs", nargs=-1, required=True)
+@click.option("--refresh", is_flag=True, help="Bypass the cached project metadata.")
+def issue_set_project_field(number: int, pairs: tuple[str, ...], refresh: bool) -> None:
+    """Set GitHub Project single-select fields for an issue.
+
+    Accepts one or more FIELD VALUE pairs and applies them in a single
+    request: `set-project-field 229 Scope MVP Complexity 5`.
+    """
+    if len(pairs) % 2:
+        raise click.ClickException("expected FIELD VALUE pairs; got an odd number of arguments")
+
+    metadata = project_metadata(refresh=refresh)
+    resolved: list[tuple[str, str, str, str]] = []
+    for field_name, value in zip(pairs[::2], pairs[1::2]):
+        field = next((f for name, f in metadata["fields"].items() if name.lower() == field_name.lower()), None)
+        if not field:
+            raise click.ClickException(f"project field not found: {field_name}")
+        if field["type"] != "ProjectV2SingleSelectField":
+            raise click.ClickException(f"project field is not single-select: {field_name}")
+        option = next((oid for oname, oid in field["options"].items() if oname.lower() == value.lower()), None)
+        if not option:
+            raise click.ClickException(f"option {value!r} not found for project field {field_name}")
+        resolved.append((field_name, value, field["id"], option))
+
+    item_id = project_item_id(metadata["id"], number)
+
+    declarations = ["$projectId: ID!", "$itemId: ID!"]
+    selections = []
+    variables: dict[str, Any] = {"projectId": metadata["id"], "itemId": item_id}
+    for index, (_, _, field_id, option_id) in enumerate(resolved):
+        declarations += [f"$field{index}: ID!", f"$option{index}: String!"]
+        selections.append(
+            f"  f{index}: updateProjectV2ItemFieldValue(input: {{"
+            f"projectId: $projectId, itemId: $itemId, fieldId: $field{index},"
+            f" value: {{singleSelectOptionId: $option{index}}}}}) {{ projectV2Item {{ id }} }}"
+        )
+        variables[f"field{index}"] = field_id
+        variables[f"option{index}"] = option_id
+
+    mutation = "mutation(%s) {\n%s\n}" % (", ".join(declarations), "\n".join(selections))
+    repo_graphql(mutation, **variables)
+    for field_name, value, _, _ in resolved:
+        click.echo(f"#{number}: {field_name}={value}")
+
+
+@issue.command("transition-state")
+@click.argument("number", type=int)
+@click.argument("old_label")
+@click.argument("new_label")
+def issue_transition_state(number: int, old_label: str, new_label: str) -> None:
+    """Swap lifecycle labels on an issue."""
+    args = ["gh", "issue", "edit", str(number), "--repo", f"{OWNER}/{REPO}"]
+    if old_label != new_label:
+        args.extend(["--remove-label", old_label])
+    args.extend(["--add-label", new_label])
+    run(args)
+    click.echo(f"#{number}: {old_label} -> {new_label}")
+
+
+@issue.command("show-fields")
+@click.argument("number", type=int)
+def issue_show_fields(number: int) -> None:
+    """Show key tracker fields for an issue."""
+    query = """
+    query($owner: String!, $repo: String!, $number: Int!) {
+      repository(owner: $owner, name: $repo) {
+        issue(number: $number) {
+          number
+          title
+          issueType { name }
+          labels(first: 50) { nodes { name } }
+          issueFieldValues(first: 50) {
+            nodes {
+              __typename
+              ... on IssueFieldSingleSelectValue { name field { ... on IssueFieldSingleSelect { name } } }
+            }
+          }
+          projectItems(first: 20) { nodes { project { title } } }
+        }
+      }
+    }
+    """
+    data = repo_graphql(query, owner=OWNER, repo=REPO, number=number)["data"]["repository"]["issue"]
+    result = {
+        "number": data["number"],
+        "title": data["title"],
+        "type": (data.get("issueType") or {}).get("name"),
+        "labels": [n["name"] for n in data["labels"]["nodes"]],
+        "native_fields": {
+            n["field"]["name"]: n["name"]
+            for n in data["issueFieldValues"]["nodes"]
+            if n.get("__typename") == "IssueFieldSingleSelectValue" and n.get("field")
+        },
+        "projects": [n["project"]["title"] for n in data["projectItems"]["nodes"]],
+    }
+    click.echo(json.dumps(result, indent=2, ensure_ascii=False))
+
+
+if __name__ == "__main__":
+    cli()

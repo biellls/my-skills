@@ -153,6 +153,7 @@ Model- or user-reachable when the situation calls for them.
 | [`delegate`](./skills/engineering/delegate/SKILL.md) | Orchestrate worthwhile background agents through the Herdr-backed Delegate extension, with status UI and isolated writer worktrees. |
 | [`diagnosing-bugs`](./skills/engineering/diagnosing-bugs/SKILL.md) | Build a tight reproduce → minimise → hypothesise → fix loop for hard bugs and performance regressions. |
 | [`domain-modeling`](./skills/engineering/domain-modeling/SKILL.md) | Sharpen project terminology, stress-test domain concepts, and update `CONTEXT.md` / ADRs inline. |
+| [`github-tools`](./skills/engineering/github-tools/SKILL.md) | Inspect and update GitHub Issue types, native Priority, lifecycle labels, and Project single-select fields using bundled helpers. |
 | [`prototype`](./skills/engineering/prototype/SKILL.md) | Build a throwaway prototype to answer a design, logic, state, or UI question. |
 | [`research`](./skills/engineering/research/SKILL.md) | Investigate a question against high-trust primary sources and capture cited findings in the repo. |
 | [`resolving-merge-conflicts`](./skills/engineering/resolving-merge-conflicts/SKILL.md) | Resolve an in-progress git merge or rebase conflict without aborting. |

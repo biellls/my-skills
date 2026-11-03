@@ -13,6 +13,8 @@ Issues and specs for this repo live as GitHub issues. Use the `gh` CLI for all o
 
 Infer the repo from `git remote -v` — `gh` does this automatically when run inside a clone.
 
+For native Issue Type/Priority, lifecycle-label swaps, and Project single-select updates, use the `/github-tools` skill (install it alongside the workflow skills). It bundles the helper script; no repo-local copy is needed. Record this repo's Project owner/number and field/label conventions here or in linked docs when applicable; the skill reads that context.
+
 ## Pull requests as a triage surface
 
 **PRs as a request surface: no.** _(Set to `yes` if this repo treats external PRs as feature requests; `/triage` reads this flag.)_
