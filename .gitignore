@@ -2,6 +2,5 @@
 node_modules
 
 .scratch/
-.delegate.json
 
 projects.local.md
