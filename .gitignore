@@ -4,3 +4,7 @@ node_modules
 .scratch/
 
 projects.local.md
+
+# Editor swap files
+*.swp
+*.swo
