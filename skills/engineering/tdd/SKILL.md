@@ -7,7 +7,7 @@ description: Test-driven development. Use when the user wants to build features 
 
 TDD is the red → green loop. This skill is the reference that makes that loop produce tests worth keeping: what a good test is, where tests go, the anti-patterns, and the rules of the loop. Every section applies on every cycle — consult them before and during the loop, not after.
 
-When exploring the codebase, read `CONTEXT.md` (if it exists) so test names and interface vocabulary match the project's domain language, and respect ADRs in the area you're touching.
+When exploring the codebase, read the domain glossary — the root `CONTEXT.md`, or in a multi-context repo the `CONTEXT.md` of each context relevant to the area, found via the root `CONTEXT-MAP.md` — if it exists, so test names and interface vocabulary match the project's domain language, and respect ADRs in the area you're touching.
 
 Read `docs/agents/project-lifecycle.md` if present. Use the **Project development stage** as context for testing trade-offs: prototype learning speed, beta core behaviour and explicit invariants, or stable regression/error-mode protection. It is not a decision rule.
 

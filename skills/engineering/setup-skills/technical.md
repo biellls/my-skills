@@ -80,7 +80,7 @@ Anything else a builder should know, including the current Complexity / Uncertai
 - **Requirements are testable and traceable.** Each requirement must be checkable by one or more acceptance/TDD tests, carry a stable ID, and cite the `US-*`/`AC-*` it derives from when it flows from the functional layer. Group by kind; omit empty groups. Vague prose that can't back a test isn't a requirement.
 - **Fewest seams, highest seams.** Prefer existing seams; propose new ones only at the highest point, as few as possible.
 - **No file paths or code snippets.** They go stale fast. Exception: a `/prototype` snippet that encodes a decision more precisely than prose can (state machine, reducer, schema, type shape) — inline it, trimmed to the decision-rich part, noting it came from a prototype.
-- **Write in `CONTEXT.md` terms.** Use the canonical glossary; a missing concept is a signal for `/domain-modeling`.
+- **Write in `CONTEXT.md` terms.** Use the canonical glossary (in a multi-context repo, the `CONTEXT.md` of the context the work belongs to); a missing concept is a signal for `/domain-modeling`.
 - **Respect ADRs.** Cross-check relevant ADRs; don't echo a pattern a later ADR replaced. If a decision contradicts an ADR, surface it.
 - **Weight decisions by the project stage.** Read `docs/agents/project-lifecycle.md` if present and use the **Project development stage** as context for how much the spec should invest in defensive handling, error handling, migration/compatibility paths, and test depth — prototype leans toward speed and isolation, stable toward compatibility and regression safety. It is context for trade-offs, not a decision rule.
 - **Shaping never publishes.** Producing the spec is alignment — persisting it to the tracker is `/to-tickets`' job.

@@ -48,7 +48,7 @@ Default posture: these skills were designed for GitHub. If a `git remote` points
 - **Local markdown** — issues live as files under `.scratch/<feature>/` in this repo (good for solo projects or repos without a remote)
 - **Other** (Jira, Linear, etc.) — ask the user to describe the workflow in one paragraph; the skill will record it as freeform prose
 
-Record the choice in `docs/agents/issue-tracker.md`. The GitHub and GitLab templates carry a "PRs as a request surface" flag, defaulted **off** — leave it off and don't raise it; a user who wants external PRs in the triage queue can flip the flag in the file later.
+Record the choice in `docs/agents/issue-tracker.md`. For GitHub, ask whether issues are tracked in GitHub Projects; if so, fill the template's Projects table (one row per Project), otherwise drop that section. The GitHub and GitLab templates carry a "PRs as a request surface" flag, defaulted **off** — leave it off and don't raise it; a user who wants external PRs in the triage queue can flip the flag in the file later.
 
 **Section B — Triage label vocabulary.** Skip this section entirely if the `triage` skill isn't installed (exploration told you) — an uninstalled skill needs no labels.
 
@@ -60,7 +60,7 @@ The defaults are the five canonical roles, each label string equal to its name: 
 
 **Section C — Domain docs.** Default to **single-context** — one `CONTEXT.md` + `docs/adr/` at the repo root. This fits almost every repo; write it without asking.
 
-Offer **multi-context** — a root `CONTEXT-MAP.md` pointing to per-context `CONTEXT.md` files — only when exploration found monorepo signals. Then confirm which layout they want.
+Offer **multi-context** — a root `CONTEXT-MAP.md` pointing to per-context `CONTEXT.md` files — only when exploration found monorepo signals or the user says the repo holds several products or bounded contexts. Then confirm which layout they want and where each context lives, and write that real tree into `docs/agents/domain.md` in place of the template's example.
 
 **Section D — Altitudes.** No question. The four planning altitudes are universal, so write `docs/agents/altitudes.md` and its per-altitude house shapes `docs/agents/intent.md`, `docs/agents/functional-issues.md`, `docs/agents/technical.md`, and `docs/agents/implementation-slices.md` from the seeds as-is. Mention them in passing so the user knows they're there and can edit them later.
 

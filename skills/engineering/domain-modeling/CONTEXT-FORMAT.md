@@ -58,3 +58,5 @@ The skill infers which structure applies:
 - If neither exists, create a root `CONTEXT.md` lazily when the first term is resolved
 
 When multiple contexts exist, infer which one the current topic relates to. If unclear, ask.
+
+A term used by several contexts is defined once, in the context that owns it — the one whose behaviour gives the term its meaning. Other contexts link to that definition instead of redefining it, and record only a genuinely different local meaning as their own term. Note the shared term under the map's **Relationships**.

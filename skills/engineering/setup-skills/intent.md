@@ -49,7 +49,7 @@ Where each Candidate Issue should go once shaped:
 - **Pass the cold-read test.** If the intent only makes sense to someone who was in the conversation, it isn't done.
 - **Don't deepen to score.** Never expand a candidate into functional or technical detail just to sharpen its Complexity / Uncertainty numbers — they stay provisional here.
 - **Check for overlap first.** Search existing Issues before inventing new ones; prefer `merge-with-existing` or `pull-existing` over a duplicate.
-- **Write in `CONTEXT.md` terms.** Use the canonical glossary; a concept missing from it is a signal for `/domain-modeling`, not a licence to coin a synonym.
+- **Write in `CONTEXT.md` terms.** Use the canonical glossary (in a multi-context repo, the `CONTEXT.md` of the context the work belongs to); a concept missing from it is a signal for `/domain-modeling`, not a licence to coin a synonym.
 - **Shaping never publishes.** Producing Candidate Issues is alignment, not commitment — publishing to the tracker is `/to-tickets`' job.
 
 ## Repo-specific overrides

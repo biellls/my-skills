@@ -17,7 +17,7 @@ The aligned work is in the conversation context, or passed as a reference (a dra
 
 ## Publish the shaping branch
 
-If `/shape-work` created a branch for `CONTEXT.md` or ADR changes, verify those changes are committed, push the branch to `origin`, and set its upstream before publishing the tickets. Add a **Starting branch** reference to every published Issue and implementation Sub-issue that depends on those changes, naming the remote branch and stating that `/implement` must start from it. This reference is required even when the same branch is already linked from the parent Issue; each agent-grabbable ticket must be self-contained.
+If `/shape-work` created a branch for changes to domain docs (`CONTEXT.md`, `CONTEXT-MAP.md`, or ADRs), verify those changes are committed, push the branch to `origin`, and set its upstream before publishing the tickets. Add a **Starting branch** reference to every published Issue and implementation Sub-issue that depends on those changes, naming the remote branch and stating that `/implement` must start from it. This reference is required even when the same branch is already linked from the parent Issue; each agent-grabbable ticket must be self-contained.
 
 If shaping created no branch, omit the reference; implementation will start from the latest remote default branch.
 

@@ -58,7 +58,7 @@ Mechanism, seams, testing, architecture, and unresolved terminology questions de
 - **Use real actors in User stories.** Do not write counterfeit technical stories like "As an orchestrator..."; those become technical Requirements instead.
 - **Use stable IDs.** User stories use `US-*`; acceptance criteria use `AC-*`.
 - **Don't bias open questions.** Naming a specific technology is fine only when the choice is genuinely settled. Otherwise say the how is a technical-definition decision.
-- **Write in `CONTEXT.md` terms.** Use the canonical glossary; don't introduce looser synonyms.
+- **Write in `CONTEXT.md` terms.** Use the canonical glossary (in a multi-context repo, the `CONTEXT.md` of the context the work belongs to); don't introduce looser synonyms.
 - **Check for overlap first.** Search existing Issues before creating. If a new Issue is a sibling or replacement, trace both directions.
 - **Respect ADRs.** Cross-check relevant ADRs; don't echo a pattern a later ADR replaced.
 - **Functional splits create sibling Issues.** If definition reveals multiple functional outcomes, create replacement sibling Issues and close/archive the original with trace links. Do not create Sub-issues here.

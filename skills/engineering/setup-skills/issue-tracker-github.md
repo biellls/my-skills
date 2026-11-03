@@ -15,6 +15,18 @@ Infer the repo from `git remote -v` — `gh` does this automatically when run in
 
 For native Issue Type/Priority, lifecycle-label swaps, and Project single-select updates, use the `/github-tools` skill (install it alongside the workflow skills). It bundles the helper script; no repo-local copy is needed. Record this repo's Project owner/number and field/label conventions here or in linked docs when applicable; the skill reads that context.
 
+## Projects
+
+_(Delete this section if the repo doesn't track issues in GitHub Projects.)_
+
+| Project | Owner | Number | Holds |
+| ------- | ----- | ------ | ----- |
+| _name_  | _owner_ | _n_ | _what belongs here_ |
+
+- **One Project per issue.** When publishing, add the issue to the single Project whose **Holds** fits best: `gh project item-add <number> --owner <owner> --url <issue-url>`. If two fit, choose the one where the issue's main question lives. Sub-issues and wayfinder children go in their parent's Project.
+- **Scope lists to a Project** with GitHub search: add `--search "project:<owner>/<number>"` to `gh issue list`; it combines with `--label` and `--state`. `gh issue view <n> --json projectItems` shows which Project an issue is in.
+- `/github-tools` takes the Project from `AGENT_GITHUB_PROJECT_OWNER` / `AGENT_GITHUB_PROJECT_NUMBER`; set them to the issue's Project.
+
 ## Pull requests as a triage surface
 
 **PRs as a request surface: no.** _(Set to `yes` if this repo treats external PRs as feature requests; `/triage` reads this flag.)_

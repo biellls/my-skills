@@ -37,7 +37,7 @@ The whole map at low resolution, loaded once per session. Open tickets are **not
 
 <domain; skills every session should consult; standing preferences for this effort>
 
-<!-- Map branch: `wayfinder/<map-slug>` — added once a session first changes CONTEXT.md or ADRs; see "Branches and worktrees" -->
+<!-- Map branch: `wayfinder/<map-slug>` — added once a session first changes domain docs (CONTEXT.md, CONTEXT-MAP.md, or ADRs); see "Branches and worktrees" -->
 
 ## Decisions so far
 
@@ -76,7 +76,7 @@ The answer isn't part of the body — it's recorded on resolution (see [Work thr
 
 The map lives on the tracker; file changes never land in the primary checkout, which may sit on an old branch far behind `origin`. Every session works in its own git worktree, entered before reading any code or docs. Before creating one, fetch `origin` and identify the repository's remote default branch (`origin/main` when that is the default); do not base anything on a stale local branch.
 
-- **The map branch.** Decisions that modify `CONTEXT.md` or ADRs (usually via `/domain-modeling`) accumulate on one branch per map, `wayfinder/<map-slug>`. The first session that needs such an edit creates it from the latest `origin/<default-branch>`, pushes it with an upstream, and records it in the map's **Notes** as the effort's **Map branch**. Later sessions create their worktree from the latest remote map branch, bring it up to date with `origin/<default-branch>` per the repo's merge or rebase convention, commit, and push before recording the resolution — sessions run in parallel, so an unpushed map branch is invisible to them. If the push is rejected, integrate the remote map branch and retry; never force-push it. Do not create the map branch when no session has produced domain-document changes.
+- **The map branch.** Decisions that modify domain docs (`CONTEXT.md`, `CONTEXT-MAP.md`, or ADRs) (usually via `/domain-modeling`) accumulate on one branch per map, `wayfinder/<map-slug>`. The first session that needs such an edit creates it from the latest `origin/<default-branch>`, pushes it with an upstream, and records it in the map's **Notes** as the effort's **Map branch**. Later sessions create their worktree from the latest remote map branch, bring it up to date with `origin/<default-branch>` per the repo's merge or rebase convention, commit, and push before recording the resolution — sessions run in parallel, so an unpushed map branch is invisible to them. If the push is rejected, integrate the remote map branch and retry; never force-push it. Do not create the map branch when no session has produced domain-document changes.
 - **Throwaway branches.** Research findings and prototypes are primary sources, not decisions: each goes on its own `research/<name>` or `prototype/<name>` branch, in its own worktree, created from the latest remote map branch if one exists or else from `origin/<default-branch>`. Push it and link it from the ticket. These branches never merge into the map branch; only the decision they settled does, if it touches domain docs.
 
 When the map is cleared, the map branch is the handoff: `/shape-work` starts from it, so the domain-document changes reach `/to-tickets` and `/implement` as their **Starting branch**.

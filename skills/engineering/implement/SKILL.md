@@ -18,7 +18,7 @@ Tie every delegated slice to its exact Sub-issue in the agent brief. As each age
 
 Work in a dedicated git worktree, never directly in the primary checkout. Before creating it, fetch `origin` and identify the repository's remote default branch (`origin/main` when that is the default); do not rely on a stale local default branch.
 
-If the tickets reference a pushed shaping branch containing `CONTEXT.md` or ADR changes, create the implementation branch and worktree from that remote branch, then bring it up to date with the latest `origin/<default-branch>` before changing code. Otherwise create them directly from the latest `origin/<default-branch>`. Preserve the shaping commits and follow the repository's merge or rebase convention when integrating the current default branch.
+If the tickets reference a pushed shaping branch containing changes to domain docs (`CONTEXT.md`, `CONTEXT-MAP.md`, or ADRs), create the implementation branch and worktree from that remote branch, then bring it up to date with the latest `origin/<default-branch>` before changing code. Otherwise create them directly from the latest `origin/<default-branch>`. Preserve the shaping commits and follow the repository's merge or rebase convention when integrating the current default branch.
 
 If implementing multiple tickets, orchestrate sub-agents in the background to preserve your context window. When briefing the agents do not duplicate content already captured in other artifacts (specs, plans, ADRs, issues, commits, diffs). Reference them by path or URL instead.
 

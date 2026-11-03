@@ -2,6 +2,8 @@
 
 ADRs live in `docs/adr/` and use sequential numbering: `0001-slug.md`, `0002-slug.md`, etc.
 
+In a multi-context repo (a root `CONTEXT-MAP.md` exists), a decision that binds every context goes in the root `docs/adr/`; a decision scoped to one context goes in that context's `docs/adr/`, next to its `CONTEXT.md`. If you can't tell which, ask.
+
 Create the `docs/adr/` directory lazily — only when the first ADR is needed.
 
 ## Template
@@ -24,7 +26,7 @@ Only include these when they add genuine value. Most ADRs won't need them.
 
 ## Numbering
 
-Scan `docs/adr/` for the highest existing number and increment by one.
+Scan the `docs/adr/` directory you're writing to for the highest existing number and increment by one. Each directory numbers independently, so cite a context-scoped ADR with its context (e.g. "billing ADR-0003") when the bare number would be ambiguous.
 
 ## When to offer an ADR
 
