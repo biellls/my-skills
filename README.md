@@ -158,6 +158,7 @@ Model- or user-reachable when the situation calls for them.
 | [`research`](./skills/engineering/research/SKILL.md) | Investigate a question against high-trust primary sources and capture cited findings in the repo. |
 | [`resolving-merge-conflicts`](./skills/engineering/resolving-merge-conflicts/SKILL.md) | Resolve an in-progress git merge or rebase conflict without aborting. |
 | [`tdd`](./skills/engineering/tdd/SKILL.md) | Develop with a red-green-refactor loop, one vertical slice and one agreed seam at a time. |
+| [`wizard`](./skills/engineering/wizard/SKILL.md) | Generate an interactive bash wizard that walks you through steps only a human can do, such as dashboards, credentials, CI secrets or a one-off migration. |
 
 ### Productivity ([`skills/productivity`](./skills/productivity/README.md))
 
