@@ -24,6 +24,8 @@ If implementing multiple tickets, orchestrate sub-agents in the background to pr
 
 Load the `tdd` skill and use it where possible, at pre-agreed seams.
 
+When a step needs something only the user can do (sign-ups, dashboards, credentials), load the `wizard` skill instead of listing the steps, and tell the sub-agents you brief to do the same. Close a wizard Sub-issue only once the user has run the wizard and you have checked its results.
+
 Run typechecking regularly, single test files regularly, and the full test suite once at the end.
 
 Once done, run a background sub-agent that loads the `code-review` skill to review the work. Align with the user how many rounds of review he wants. If he gives no preference, default to at most five rounds. Stop when reaching the agreed limit, or earlier when the review comes up with only nitpicks.
