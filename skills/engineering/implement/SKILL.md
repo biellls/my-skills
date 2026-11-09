@@ -24,7 +24,7 @@ If implementing multiple tickets, orchestrate sub-agents in the background to pr
 
 Load the `tdd` skill and use it where possible, at pre-agreed seams.
 
-When a step needs something only the user can do (sign-ups, dashboards, credentials), load the `wizard` skill instead of listing the steps, and tell the sub-agents you brief to do the same. Close a wizard Sub-issue only once the user has run the wizard and you have checked its results.
+When a step needs something only the user can do (sign-ups, dashboards, credentials), load the `walkthrough` skill instead of listing the steps, and tell the sub-agents you brief to do the same. Close a walkthrough Sub-issue only once its checks pass.
 
 Run typechecking regularly, single test files regularly, and the full test suite once at the end.
 

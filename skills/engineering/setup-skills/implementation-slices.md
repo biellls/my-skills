@@ -57,7 +57,7 @@ Each blocking Sub-issue, or "None — can start immediately".
 - **Vertical, not horizontal.** A slice that only touches one layer isn't a tracer bullet.
 - **No file paths or code snippets.** They go stale fast — same prototype-snippet exception as the technical altitude.
 - **Blocking edges gate, they don't decorate.** A Sub-issue lists only the Sub-issues that genuinely must land first.
-- **Human steps get their own slice.** Steps only a human can do (accounts, sign-ins, dashboards, credentials) go in a wizard slice, built with the `wizard` skill. Its acceptance criteria are the values it captures and where each one goes. Keep it to those steps, and leave everything that can be automated to the agent slices it blocks.
+- **Human steps get their own slice.** Steps only a human can do (accounts, sign-ins, dashboards, credentials) go in a walkthrough slice, done with the `walkthrough` skill. Its acceptance criteria are the values it captures and where each one goes. Keep it to those steps, and leave everything that can be automated to the agent slices it blocks.
 - **Shaping never publishes.** Deciding the slices is alignment — creating the Sub-issues on the tracker is `/to-tickets`' job.
 
 ## Repo-specific overrides
