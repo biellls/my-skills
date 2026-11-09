@@ -14,7 +14,6 @@ It's critical to start from the actual root, as every branch derives from this.
 
 - Think deeply: what is the key insight from which we can derive everything else?
 - Does your proposed root depend on unexplained terminology or concepts? If so take a step back to find the actual root. There is probably a key insight from which this one can follow.
-- Does your root 
 
 The root is found when the learner can reason from it into every other branch without any logical leaps.
 
@@ -58,10 +57,6 @@ In order to find the best next question, keep in mind the root insight, the stud
 - Each new question should serve to guide an insight that is a small enough leap from the student's current position that he could plausibly derive it on his own. If we stray too far from the zone of proximal development the student will feel overwhelmed. If the leaps are too tiny he'll feel like there's no progres, although you will feel that through his answers. It's better to err on the side of smaller steps.
 
 When an answer is incomplete, acknowledge only the specific part that is sound, then guide toward what is missing. When it is mistaken, locate the assumption producing the mistake and try to correct course rather than immediately replacing it with the answer.
-
-## Persistence
-
-Read and follow [PERSISTENCE.md](./PERSISTENCE.md) before teaching. It defines the per-project learning store, evidence ledger, continuation rules, and spaced-review schedule.
 
 ## Guardrails
 
