@@ -1,5 +1,5 @@
 ---
-name: learn-with-conversation
+name: learn-from-first-principles
 description: Teach any topic with guided discovery through a conversation that sparks curiosity in the user and grows an understanding tree from its root insight.
 disable-model-invocation: true
 ---
