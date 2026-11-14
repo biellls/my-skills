@@ -106,6 +106,7 @@ It interviews you, then writes the config under `docs/agents/` and adds an `## A
 | `docs/agents/triage-labels.md` | The triage role → label-string mapping (only when `triage` is installed). |
 | `docs/agents/project-lifecycle.md` | The repo's **Project development stage** (`prototype` / `beta` / `stable`) as trade-off context. |
 | `docs/agents/domain.md` | Domain-doc layout (`CONTEXT.md` + ADRs) and the consumer rules for reading them. |
+| `docs/agents/filing.md` | Optional: where the repo's information map is, for `/file-this` (and for `wayfinder` and `research` to know filing is set up). |
 | `docs/agents/altitudes.md` | The four planning altitudes and which artifact carries each, plus per-altitude house shapes (`intent.md`, `functional-issues.md`, `technical.md`, `implementation-slices.md`). |
 
 Everything is plain markdown — edit `docs/agents/*.md` directly afterwards. Re-running the skill is only needed to switch trackers, change the project stage, or start over.
@@ -138,7 +139,7 @@ Reachable only when explicitly requested.
 | [`wayfinder`](./skills/engineering/wayfinder/SKILL.md) | Plan a huge, foggy effort as a shared map of decision tickets, resolved one at a time until the way to the destination is clear. |
 | [`improve-codebase-architecture`](./skills/engineering/improve-codebase-architecture/SKILL.md) | Scan a codebase for deepening opportunities, present them as a visual HTML report, then grill through your pick. |
 | [`triage`](./skills/engineering/triage/SKILL.md) | Move Issues (and optionally external PRs) through a state machine of triage roles. |
-| [`setup-skills`](./skills/engineering/setup-skills/SKILL.md) | Configure a repo for these engineering skills: issue tracker, triage labels, project lifecycle, altitudes, and domain docs. Run once per repo. |
+| [`setup-skills`](./skills/engineering/setup-skills/SKILL.md) | Configure a repo for these engineering skills: issue tracker, triage labels, project lifecycle, altitudes, domain docs, and optionally filing. Run once per repo. |
 | [`uat`](./skills/engineering/uat/SKILL.md) | Bring the app up with the feature just built, seeded and with any files in `~/Downloads`, plus a short plan of what to open and test by hand. |
 | [`retro`](./skills/engineering/retro/SKILL.md) | Look back over a coding session and propose environment fixes (navigation pointers, automated checks, coding standards, leaner steering), most severe first. Proposes only. |
 
@@ -162,7 +163,7 @@ Model- or user-reachable when the situation calls for them.
 
 ### Productivity ([`skills/productivity`](./skills/productivity/README.md))
 
-Daily non-code workflows: pressure-testing decisions, handing work off, learning, and writing better skills.
+Daily non-code workflows: pressure-testing decisions, handing work off, filing information, learning, and writing better skills.
 
 #### User-invoked
 
@@ -170,6 +171,7 @@ Reachable only when explicitly requested.
 
 | Skill | Use it to |
 | --- | --- |
+| [`file-this`](./skills/productivity/file-this/SKILL.md) | File a research finding, meeting or document where the repo's information map says it belongs, linked back to its source. Needs the filing section of `/setup-skills`. |
 | [`grill-me`](./skills/productivity/grill-me/SKILL.md) | Get relentlessly interviewed about a plan or design until every branch is resolved. |
 | [`handoff`](./skills/productivity/handoff/SKILL.md) | Compact the current conversation into a handoff document for another agent. |
 | [`learn-from-first-principles`](./skills/productivity/learn-from-first-principles/SKILL.md) | Learn any topic through guided conversation, growing understanding one branch at a time from its root insight. |

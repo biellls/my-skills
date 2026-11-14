@@ -1,0 +1,5 @@
+interface:
+  display_name: "File This"
+  short_description: "File information where the information map says"
+policy:
+  allow_implicit_invocation: false
