@@ -4,7 +4,7 @@ description: File information (a research finding, a meeting, a document, a cust
 disable-model-invocation: true
 ---
 
-Filing puts a piece of information where the people and agents who need it will look for it, and links it back to where it came from. This skill is one **loop** for every kind of information; which kinds exist, where each lives and who approves what are in the repo's **information map** and the **guide** each kind links to. When the map and this skill seem to disagree, the map wins.
+Filing puts a piece of information where the people and agents who need it will look for it, and links it back to where it came from. This skill is one **procedure** for filing any kind of information; which kinds exist, where each lives and who approves what are in the repo's **information map** and the **guide** each kind links to. When the map and this skill seem to disagree, the map wins.
 
 ## 0. Find the map
 
@@ -16,7 +16,7 @@ Read the map and the general filing rules it links to.
 
 List what the user asked to file, one line per item with its source (path, branch, URL or issue). For a wayfinder map, the items are the research findings linked from its research tickets. Every item on the list ends filed, deliberately left where it is, or skipped by the user.
 
-## 2. For each item, run the loop
+## 2. File each item
 
 1. **Identify its kind.** Match the item to one row of the map. When two rows could fit, or none does, say so and ask. A kind with no row gets one by the map's rule for adding a kind, and the new row follows the map's approval rule.
 2. **Read its row and the guide it links.**
