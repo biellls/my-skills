@@ -1,6 +1,6 @@
 ---
 name: setup-skills
-description: Configure this repo for the engineering skills — set up its issue tracker, triage label vocabulary, project lifecycle, domain doc layout, and optionally filing. Run once before first use of the other engineering skills.
+description: Configure this repo for the engineering skills — set up its issue tracker, triage label vocabulary, project lifecycle, domain doc layout, and optionally filing (for `/file-this`). Run once before first use of the other engineering skills.
 disable-model-invocation: true
 ---
 
@@ -78,11 +78,7 @@ Choose the repo's current **Project development stage** (recommended: **beta**):
 
 Record the chosen stage in `docs/agents/project-lifecycle.md` — set the `Project development stage:` line in the seed to the answer.
 
-**Section F — Filing (optional).** Ask exactly one question, recommending **no** unless exploration found an information map:
-
-> Does this repo file information (research findings, meetings, documents) against an information map, a doc that says where each kind of information lives? (recommended: **no**)
-
-On **no**, skip it: no `docs/agents/filing.md`, no `### Filing` sub-block. `/file-this` then stops and points here, and `wayfinder` and `research` don't file or recommend filing. On **yes**, ask where the map's entry doc is and how an agent reads it (a repo path, a URL, a connector URI), and fill both lines of the [filing.md](./filing.md) seed. The map itself and its guides are the user's to write; this section only points at them.
+**Section F — Filing (optional).** Filing means `/file-this` files information against an **information map**, a doc that says where each kind of information lives. If exploration found one, ask whether to point filing at it; otherwise recommend skipping. On yes, fill the [filing.md](./filing.md) seed with where the map is and how an agent reads it. The map and its guides are the user's to write.
 
 ### 3. Confirm and edit
 
