@@ -12,9 +12,9 @@ Read `docs/agents/filing.md`. It says where the information map is and how to re
 
 Read the map and the general filing rules it links to.
 
-## 1. Gather the items
+## 1. Decide what's worth filing
 
-List what the user asked to file, one line per item with its source (path, branch, URL or issue). For a wayfinder map, the items are the research findings linked from its research tickets. Every item on the list ends filed, deliberately left where it is, or skipped by the user.
+The user points at something: a map, an issue, a document, a folder. Work out what in it is worth filing, and propose that.
 
 ## 2. File each item
 
@@ -27,4 +27,4 @@ List what the user asked to file, one line per item with its source (path, branc
 
 ## 3. Report
 
-End with the list: each item, its kind, where it went (or that it was left in place), and the links written. Name anything skipped, and any change to the map or a guide still awaiting approval.
+Say what was filed where, with the links written, and any change to the map or a guide still awaiting approval.
