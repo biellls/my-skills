@@ -1,6 +1,6 @@
 ---
 name: setup-skills
-description: Configure this repo for the engineering skills — set up its issue tracker, triage label vocabulary, project lifecycle, and domain doc layout. Run once before first use of the other engineering skills.
+description: Configure this repo for the engineering skills — set up its issue tracker, triage label vocabulary, project lifecycle, domain doc layout, and optionally filing (for `/file-this`). Run once before first use of the other engineering skills.
 disable-model-invocation: true
 ---
 
@@ -13,6 +13,7 @@ Scaffold the per-repo configuration that the engineering skills assume:
 - **Project lifecycle** — the repo's Project development stage (`prototype`, `beta`, or `stable`) for engineering trade-off context
 - **Domain docs** — where `CONTEXT.md` and ADRs live, and the consumer rules for reading them
 - **Altitudes** — the three planning altitudes (intent / functional / technical) the shaping and spec skills descend through
+- **Filing** (optional) — where the repo's information map is, for `/file-this`
 
 This is a prompt-driven skill, not a deterministic script. Explore, present what you found, confirm with the user, then write.
 
@@ -29,6 +30,7 @@ Look at the current repo to understand its starting state. Read whatever exists;
 - `docs/agents/` — does this skill's prior output already exist? Check for `docs/agents/project-lifecycle.md` too.
 - `.scratch/` — sign that a local-markdown issue tracker convention is already in use
 - Is the `triage` skill installed? (a `triage` skill folder alongside this one, or `triage` in your available skills.) This decides whether Section B runs at all.
+- `docs/agents/filing.md`, and any doc the repo or its `CLAUDE.md` names as an information map (a doc that says where each kind of information lives) — a sign the filing section applies.
 - Monorepo signals — a `pnpm-workspace.yaml`, a `workspaces` field in `package.json`, or a populated `packages/*` with its own `src/`. Present only in a genuinely large multi-package repo; their absence means single-context, which is almost every repo.
 
 ### 2. Present findings and ask
@@ -76,12 +78,14 @@ Choose the repo's current **Project development stage** (recommended: **beta**):
 
 Record the chosen stage in `docs/agents/project-lifecycle.md` — set the `Project development stage:` line in the seed to the answer.
 
+**Section F — Filing (optional).** Filing means `/file-this` files information against an **information map**, a doc that says where each kind of information lives. If exploration found one, ask whether to point filing at it; otherwise recommend skipping. On yes, fill the [filing.md](./filing.md) seed with where the map is and how an agent reads it. The map and its guides are the user's to write.
+
 ### 3. Confirm and edit
 
 Show the user a draft of:
 
 - The `## Agent skills` block to add to whichever of `CLAUDE.md` / `AGENTS.md` is being edited (see step 4 for selection rules)
-- The contents of `docs/agents/issue-tracker.md`, `docs/agents/project-lifecycle.md`, `docs/agents/domain.md`, `docs/agents/altitudes.md`, `docs/agents/intent.md`, `docs/agents/functional-issues.md`, `docs/agents/technical.md`, `docs/agents/implementation-slices.md`, and `docs/agents/triage-labels.md` (the last only when `triage` is installed)
+- The contents of `docs/agents/issue-tracker.md`, `docs/agents/project-lifecycle.md`, `docs/agents/domain.md`, `docs/agents/altitudes.md`, `docs/agents/intent.md`, `docs/agents/functional-issues.md`, `docs/agents/technical.md`, `docs/agents/implementation-slices.md`, `docs/agents/triage-labels.md` (only when `triage` is installed), and `docs/agents/filing.md` (only when Section F was answered **yes**)
 
 Let them edit before writing.
 
@@ -121,9 +125,13 @@ The block:
 ### Altitudes
 
 Intent / functional / technical / implementation-slices planning altitudes and which artifact carries each. See `docs/agents/altitudes.md`; the per-altitude house shapes are in `docs/agents/intent.md`, `docs/agents/functional-issues.md`, `docs/agents/technical.md`, and `docs/agents/implementation-slices.md`.
+
+### Filing
+
+[one-line summary of where the information map is]. See `docs/agents/filing.md`.
 ```
 
-Include the `### Triage labels` sub-block, and write `docs/agents/triage-labels.md`, only when `triage` is installed and Section B ran. When it isn't, both are omitted.
+Include the `### Triage labels` sub-block, and write `docs/agents/triage-labels.md`, only when `triage` is installed and Section B ran. When it isn't, both are omitted. Likewise, include the `### Filing` sub-block and write `docs/agents/filing.md` only when Section F was answered **yes**.
 
 Then write the docs files using the seed templates in this skill folder as a starting point:
 
@@ -138,9 +146,10 @@ Then write the docs files using the seed templates in this skill folder as a sta
 - [functional-issues.md](./functional-issues.md) — the functional-altitude house shape and rules
 - [technical.md](./technical.md) — the technical-altitude house shape (the spec) and rules
 - [implementation-slices.md](./implementation-slices.md) — the slice-altitude house shape (Sub-issues) and rules
+- [filing.md](./filing.md) — where the information map is (only if Section F was answered yes)
 
 For "other" issue trackers, write `docs/agents/issue-tracker.md` from scratch using the user's description.
 
 ### 5. Done
 
-Tell the user the setup is complete and which engineering skills will now read from these files — in particular, the planning, implementation, testing, and review skills read `docs/agents/project-lifecycle.md` for Project development stage context. Mention they can edit `docs/agents/*.md` directly later — re-running this skill is only necessary if they want to switch issue trackers, change the project stage, or restart from scratch.
+Tell the user the setup is complete and which engineering skills will now read from these files — in particular, the planning, implementation, testing, and review skills read `docs/agents/project-lifecycle.md` for Project development stage context. Mention they can edit `docs/agents/*.md` directly later — re-running this skill is only necessary if they want to switch issue trackers, change the project stage, set up filing, or restart from scratch. When filing was set up, mention that `/file-this` now reads `docs/agents/filing.md`.

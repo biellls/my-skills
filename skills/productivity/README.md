@@ -6,6 +6,7 @@ General workflow tools, not code-specific.
 
 Reachable only when you type them (Claude Code: `disable-model-invocation: true`; Codex: `policy.allow_implicit_invocation: false` in `agents/openai.yaml`).
 
+- **[file-this](./file-this/SKILL.md)** — File information (a research finding, a meeting, a document) where the repo's information map says it belongs, linked back to its source. Needs the filing section of `/setup-skills`.
 - **[grill-me](./grill-me/SKILL.md)** — Get relentlessly interviewed about a plan or design until every branch of the decision tree is resolved.
 - **[handoff](./handoff/SKILL.md)** — Compact the current conversation into a handoff document so another agent can continue the work.
 - **[learn-from-first-principles](./learn-from-first-principles/SKILL.md)** — Learn any topic through guided conversation, growing understanding one branch at a time from its root insight.
