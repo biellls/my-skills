@@ -37,6 +37,8 @@ Look for the originating spec, in this order:
 
 Anything in the repo that documents how code should be written, such as `CODING_STANDARDS.md` or `CONTRIBUTING.md`.
 
+If `docs/agents/standards.md` exists, always include it, together with any files its rules bring in for the paths the diff touches (for example, a rule may name a guide to read for each area it covers). Without it, carry on as before.
+
 On top of whatever the repo documents, the Standards axis always carries the **smell baseline** below — a fixed set of Fowler code smells (_Refactoring_, ch.3) that applies even when a repo documents nothing. Project lifecycle context (`docs/agents/project-lifecycle.md`, if present) may add trade-off findings, but never hard violations by itself. Two rules bind the smell baseline:
 
 - **The repo overrides.** A documented repo standard always wins; where it endorses something the baseline would flag, suppress the smell.
