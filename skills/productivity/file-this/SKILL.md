@@ -18,12 +18,11 @@ The user points at something: a map, an issue, a document, a folder. Work out wh
 
 ## 2. File each item
 
-1. **Identify its kind.** Match the item to one row of the map. When two rows could fit, or none does, say so and ask. A kind with no row gets one by the map's rule for adding a kind, and the new row follows the map's approval rule.
-2. **Read its row and the guide it links.**
-3. **Propose where it goes.** Give the options the guide allows, recommend one, and name the exact destination and what will be written there.
-4. **Ask.** File nothing the user hasn't chosen; batch similar items into one proposal.
-5. **File.** Follow the guide and the map's rules, including any approval a change needs.
-6. **Link back.** The filed piece links to its source.
+1. **Find what the map says about it** and read the guide it points to. If the map doesn't cover it, or you can't tell which part applies, say so and ask.
+2. **Propose where it goes.** Give the options the guide allows, recommend one, and name the exact destination and what will be written there.
+3. **Ask.** File nothing the user hasn't chosen; batch similar items into one proposal.
+4. **File.** Follow the guide and the map's rules, including any approval a change needs.
+5. **Link back.** The filed piece links to its source.
 
 ## 3. Report
 
