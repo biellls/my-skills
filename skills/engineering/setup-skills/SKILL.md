@@ -32,7 +32,7 @@ Look at the current repo to understand its starting state. Read whatever exists;
 - `.scratch/` — sign that a local-markdown issue tracker convention is already in use
 - Is the `triage` skill installed? (a `triage` skill folder alongside this one, or `triage` in your available skills.) This decides whether Section B runs at all.
 - `docs/agents/filing.md`, and any doc the repo or its `CLAUDE.md` names as an information map (a doc that says where each kind of information lives) — a sign the filing section applies.
-- Frontend signals — a UI framework in `package.json` (React, Vue, Svelte, Next, etc.), HTML templates, or a components folder — and, if present, the component library and token source (e.g. `components/ui`, `tailwind.config.*`, a theme file). Also check for `docs/agents/frontend-design.md`.
+- Frontend signals — a UI framework in `package.json` (React, Vue, Svelte, Next, etc.), HTML templates, or a components folder — and, if present, the component library, token source, and design docs (e.g. `components/ui`, `tailwind.config.*`, a theme file, `DESIGN.md`). Note each separate UI surface (a website, an app, an admin panel) and its path, how the design docs mark deliberate choices, and any standards doc that already makes reviews check UI rules. Also check for `docs/agents/frontend-design.md`.
 - Monorepo signals — a `pnpm-workspace.yaml`, a `workspaces` field in `package.json`, or a populated `packages/*` with its own `src/`. Present only in a genuinely large multi-package repo; their absence means single-context, which is almost every repo.
 
 ### 2. Present findings and ask
@@ -85,10 +85,11 @@ Record the chosen stage in `docs/agents/project-lifecycle.md` — set the `Proje
 **Section G — Frontend design.** If exploration found frontend signals, the answer to the first question is yes; don't ask it.
 
 1. Will this project have a UI? On no, skip the rest of this section.
-2. Who is the primary user, and what task do they use the UI for?
-3. Should the UI be dense (data tool: tight spacing, many rows) or spacious (consumer: generous spacing, one task per screen)?
+2. What are the UI surfaces? Propose the ones exploration found, plus any the project plans.
+3. For each surface: who is the primary user, and what task do they use it for?
+4. For each surface: dense (data tool: tight spacing, many rows) or spacious (generous spacing, one task per screen)?
 
-Fill the [frontend-design.md](./frontend-design.md) seed's **Project context** with the answers. For **Design system**, write the component library and token source exploration found; if there are none, write: "Not chosen yet. The first builder that picks a component library or token source records it here."
+Fill the [frontend-design.md](./frontend-design.md) seed's **Project context**: one **Surfaces** row per surface, from the answers. Fill **Design system**, **Deliberate choices**, and **Checked elsewhere** from exploration. If there's no design system yet, write: "Not chosen yet. The first builder that picks a component library or token source records it here."
 
 ### 3. Confirm and edit
 

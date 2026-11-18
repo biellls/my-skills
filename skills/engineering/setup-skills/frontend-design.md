@@ -9,9 +9,17 @@ Rules for UI in this repo.
 
 ## Project context
 
-- **Primary user:** <who uses this UI and for what task, e.g. "operations staff reconciling invoices daily">
-- **Density:** <dense (data tool: tight spacing, many rows, small type) | spacious (consumer: generous spacing, one task per screen)>
-- **Design system:** <component library and token source, e.g. "shadcn/ui in `components/ui`, tokens in `tailwind.config.ts`"; or "Not chosen yet. The first builder that picks a component library or token source records it here.">
+- **Design system:** <where components, tokens, and design docs live, e.g. "shadcn/ui in `components/ui`, tokens in `tailwind.config.ts`"; or "Not chosen yet. The first builder that picks a component library or token source records it here.">
+- **Deliberate choices:** <how the design system marks choices made on purpose, e.g. "**Deliberate.** marks in `DESIGN.md`"; or "none">. A deliberate choice is never a finding, even when a rule below flags it.
+- **Checked elsewhere:** <rules another review already checks, e.g. "colours, icons, and voice: the Guía de estilo in `docs/agents/standards.md`, checked by the Standards axis"; or "none">. The Design review doesn't repeat them.
+
+### Surfaces
+
+One row per UI surface. "The primary user" and density in the rules below mean the row of the surface being built or reviewed.
+
+| Surface | Path | Primary user and task | Density |
+|---|---|---|---|
+| <name> | <path> | <who uses it, for what task, e.g. "operations staff reconciling invoices daily"> | <dense (data tool: tight spacing, many rows) or spacious (generous spacing, one task per screen)> |
 
 ## Principles
 
@@ -90,6 +98,7 @@ All **[judgement]**. Each is a finding unless the design system calls for it.
 
 - Screenshot at desktop width and at 375px, including the empty, loading, and error states. Use Playwright unless the repo already uses another browser-automation tool. If the app can't be run, say the review is code-only.
 - If the design system is "Not chosen yet", skip the rules that depend on it (on-scale spacing, tokens, components) and say so in the review.
+- Skip what **Checked elsewhere** lists.
 - Report each finding with its rule, where it occurs, and a concrete fix.
 
 ## What the builder may change, by stage
