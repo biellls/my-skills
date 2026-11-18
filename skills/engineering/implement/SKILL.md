@@ -8,6 +8,10 @@ Implement the work described by the user in the spec or tickets.
 
 Read `docs/agents/project-lifecycle.md` if present. Use the **Project development stage** as context when implementation choices have trade-offs (simplicity vs extension, invariants vs defensive handling, deletion vs compatibility), not as a decision rule.
 
+## Frontend design
+
+When the work touches UI, read `docs/agents/frontend-design.md` if present, and tell UI sub-agents to read it. Check the spec and issue for a recorded prototype decision; the doc's table of what the builder may change applies with or without one. In the final report, list what was moved behind disclosure.
+
 ## Issue lifecycle
 
 When the work comes from tracked tickets, read `docs/agents/issue-tracker.md`, fetch the parent Issue and its implementation-slice Sub-issues, and follow the tracker's configured workflow. As the first implementation action—before changing code or dispatching agents—move the parent Issue to **In progress**. Change the parent, not every Sub-issue; use the tracker's native status, label, or status field as documented.

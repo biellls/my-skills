@@ -45,13 +45,18 @@ This works whether the user is here to push back or not.
 
 ### 2. Generate radically different variants
 
-Draft each variant. Hold each one to:
+Read `docs/agents/frontend-design.md` if present. Draft each variant. Hold each one to:
 
+- The rules in `docs/agents/frontend-design.md`, at the **Prototype** stage.
 - The page's purpose and the data it has access to.
 - The project's component library / styling system (TailwindCSS, shadcn, MUI, plain CSS, whatever).
 - A clear exported component name, e.g. `VariantA`, `VariantB`, `VariantC`.
 
 Variants must be **structurally different** — different layout, different information hierarchy, different primary affordance, not just different colours. Three slightly-tweaked card grids isn't a UI prototype, it's wallpaper. If two drafts come out too similar, redo one with explicit "do not use a card grid" guidance.
+
+One variant shows only what the primary task needs; everything else is removed or moved behind disclosure.
+
+Each variant lists, in a top-of-file comment, what it removed and what it moved behind disclosure compared with the current page (or, for a new page, compared with everything the data offers).
 
 ### 3. Wire them together
 
@@ -91,13 +96,21 @@ Behaviour:
 
 Put the switcher in a single shared component so both sub-shapes can reuse it. Locate it wherever shared UI lives in the project.
 
-### 5. Hand it over
+### 5. Review
 
-Surface the URL (and the `?variant=` keys). The user will flip through whenever they get to it. The interesting feedback is usually **"I want the header from B with the sidebar from C"** — that's the actual design they want.
+Skip this step if the user said to skip review, or if `docs/agents/frontend-design.md` doesn't exist.
 
-### 6. Capture the answer and clean up
+Run a sub-agent that loads the `code-review` skill and runs only its Design axis against the route and the variant keys, at the **Prototype** stage.
 
-Once a variant has won, capture the answer — which variant and why — then capture the prototype the way the [SKILL](SKILL.md) describes. Fold the winner into the real code and move the rest onto the throwaway branch, not into main:
+A finding is a claim to evaluate, not an instruction. Fix the findings you agree with; for the rest, keep your reasoning for the hand-over.
+
+### 6. Hand it over
+
+Surface the URL (and the `?variant=` keys), each variant's removed and moved-behind-disclosure lists, and any review findings you didn't fix, with your reasoning. The user will flip through whenever they get to it. The interesting feedback is usually **"I want the header from B with the sidebar from C"** — that's the actual design they want.
+
+### 7. Capture the answer and clean up
+
+Once a variant has won, capture the answer — which variant, why, and its lists of what was removed and what was moved behind disclosure — then capture the prototype the way the [SKILL](SKILL.md) describes. Fold the winner into the real code and move the rest onto the throwaway branch, not into main:
 
 - **Sub-shape A** — fold the winner into the existing page; drop the losing variants and the switcher from main.
 - **Sub-shape B** — promote the winning variant to a real route; drop the throwaway route and the switcher from main.

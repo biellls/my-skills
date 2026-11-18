@@ -106,6 +106,7 @@ It interviews you, then writes the config under `docs/agents/` and adds an `## A
 | `docs/agents/triage-labels.md` | The triage role → label-string mapping (only when `triage` is installed). |
 | `docs/agents/project-lifecycle.md` | The repo's **Project development stage** (`prototype` / `beta` / `stable`) as trade-off context. |
 | `docs/agents/domain.md` | Domain-doc layout (`CONTEXT.md` + ADRs) and the consumer rules for reading them. |
+| `docs/agents/frontend-design.md` | When the project has a UI: the primary user, density, design system, and the UI rules builders read and the Design review checks. |
 | `docs/agents/filing.md` | Optional: where the repo's information map is, for `/file-this` (and for `wayfinder` and `research` to know filing is set up). |
 | `docs/agents/altitudes.md` | The four planning altitudes and which artifact carries each, plus per-altitude house shapes (`intent.md`, `functional-issues.md`, `technical.md`, `implementation-slices.md`). |
 
@@ -139,7 +140,7 @@ Reachable only when explicitly requested.
 | [`wayfinder`](./skills/engineering/wayfinder/SKILL.md) | Plan a huge, foggy effort as a shared map of decision tickets, resolved one at a time until the way to the destination is clear. |
 | [`improve-codebase-architecture`](./skills/engineering/improve-codebase-architecture/SKILL.md) | Scan a codebase for deepening opportunities, present them as a visual HTML report, then grill through your pick. |
 | [`triage`](./skills/engineering/triage/SKILL.md) | Move Issues (and optionally external PRs) through a state machine of triage roles. |
-| [`setup-skills`](./skills/engineering/setup-skills/SKILL.md) | Configure a repo for these engineering skills: issue tracker, triage labels, project lifecycle, altitudes, domain docs, and optionally filing. Run once per repo. |
+| [`setup-skills`](./skills/engineering/setup-skills/SKILL.md) | Configure a repo for these engineering skills: issue tracker, triage labels, project lifecycle, altitudes, domain docs, frontend design, and optionally filing. Run once per repo. |
 | [`uat`](./skills/engineering/uat/SKILL.md) | Bring the app up with the feature just built, seeded and with any files in `~/Downloads`, plus a short plan of what to open and test by hand. |
 | [`retro`](./skills/engineering/retro/SKILL.md) | Look back over a coding session and propose environment fixes (navigation pointers, automated checks, coding standards, leaner steering), most severe first. Proposes only. |
 
@@ -149,7 +150,7 @@ Model- or user-reachable when the situation calls for them.
 
 | Skill | Use it to |
 | --- | --- |
-| [`code-review`](./skills/engineering/code-review/SKILL.md) | Review a diff along two axes: standards and spec fidelity, run as parallel sub-agents. |
+| [`code-review`](./skills/engineering/code-review/SKILL.md) | Review a diff along separate axes: standards, spec fidelity, and, for UI changes, design, run as parallel sub-agents. |
 | [`codebase-design`](./skills/engineering/codebase-design/SKILL.md) | Apply the shared deep-module vocabulary (Module, Interface, Seam, Depth, Leverage, Locality) and run Interface checkpoints before an interface hardens. |
 | [`delegate`](./skills/engineering/delegate/SKILL.md) | Orchestrate worthwhile background agents through the Herdr-backed Delegate extension, with status UI and isolated writer worktrees. |
 | [`diagnosing-bugs`](./skills/engineering/diagnosing-bugs/SKILL.md) | Build a tight reproduce → minimise → hypothesise → fix loop for hard bugs and performance regressions. |

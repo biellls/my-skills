@@ -1,14 +1,17 @@
 ---
 name: code-review
-description: Review the changes since a fixed point (commit, branch, tag, or merge-base) along two axes — Standards (does the code follow this repo's documented coding standards?) and Spec (does the code match what the originating issue/spec asked for?). Runs both reviews in parallel sub-agents and reports them side by side. Use when the user wants to review a branch, a PR, work-in-progress changes, or asks to "review since X".
+description: Review the changes since a fixed point (commit, branch, tag, or merge-base) along separate axes — Standards (does the code follow this repo's documented coding standards?), Spec (does the code match what the originating issue/spec asked for?), and, when the change touches UI, Design (does the rendered UI follow the repo's frontend design rules?). Runs the reviews in parallel sub-agents and reports them side by side. Use when the user wants to review a branch, a PR, work-in-progress changes, or asks to "review since X".
 ---
 
-Two-axis review of the diff between `HEAD` and a fixed point the user supplies:
+Review of the diff between `HEAD` and a fixed point the user supplies, along separate axes:
 
 - **Standards** — does the code conform to this repo's documented coding standards?
 - **Spec** — does the code faithfully implement the originating issue / spec?
+- **Design** — does the rendered UI follow `docs/agents/frontend-design.md`? Runs only when that file exists and the diff touches UI files (components, pages, templates, styles).
 
-Both axes run as **parallel sub-agents** so they don't pollute each other's context, then this skill aggregates their findings.
+The axes run as **parallel sub-agents** so they don't pollute each other's context, then this skill aggregates their findings.
+
+The Design axis can also run on its own against a route instead of a diff — `prototype` does this to review its variants. Then skip steps 1–3 and spawn only the Design sub-agent, with the route and the variant keys in place of the diff.
 
 The issue tracker should have been provided to you — run `/setup-skills` if `docs/agents/issue-tracker.md` is missing.
 
@@ -59,9 +62,9 @@ Each smell reads *what it is* → *how to fix*; match it against the diff:
 - **Middle Man** — a class or function that mostly just delegates onward. → cut it, call the real target direct.
 - **Refused Bequest** — a subclass or implementer that ignores or overrides most of what it inherits. → drop the inheritance, use composition.
 
-### 4. Spawn both sub-agents in parallel
+### 4. Spawn the sub-agents in parallel
 
-Send a single message with two `Agent` tool calls. Use the `general-purpose` subagent for both.
+Send a single message with one `Agent` tool call per axis that runs. Use the `general-purpose` subagent for each.
 
 **Standards sub-agent prompt** — include:
 
@@ -78,17 +81,26 @@ Send a single message with two `Agent` tool calls. Use the `general-purpose` sub
 
 If the spec is missing, skip the Spec sub-agent and note this in the final report.
 
+**Design sub-agent prompt** — include:
+
+- The diff command and commit list (or, when run on its own, the route and variant keys).
+- The path `docs/agents/frontend-design.md`, to read in full.
+- Any prototype decision recorded on the spec or issue from step 2 — the chosen variant and its lists of what was removed and what was moved behind disclosure — or "no prototype decision".
+- When reviewing prototype variants, that the stage is **Prototype**.
+- The brief: "Review the UI against `docs/agents/frontend-design.md`, following its Reviewing section and its table of what the builder may change at this stage. Report each finding with its rule, its tag ([check] or [judgement]), where it occurs, and a concrete fix. State whether you reviewed screenshots or code only. Under 400 words."
+
 ### 5. Aggregate
 
-Present the two reports under `## Standards` and `## Spec` headings, verbatim or lightly cleaned. Do **not** merge or rerank findings — the two axes are deliberately separate (see _Why two axes_).
+Present each report under its own heading — `## Standards`, `## Spec`, `## Design` — verbatim or lightly cleaned. Do **not** merge or rerank findings — the axes are deliberately separate (see _Why separate axes_).
 
 End with a one-line summary: total findings per axis, and the worst issue _within each axis_ (if any). Don't pick a single winner across axes — that's the reranking the separation exists to prevent.
 
-## Why two axes
+## Why separate axes
 
-A change can pass one axis and fail the other:
+A change can pass one axis and fail another:
 
 - Code that follows every standard but implements the wrong thing → **Standards pass, Spec fail.**
 - Code that does exactly what the issue asked but breaks the project's conventions → **Spec pass, Standards fail.**
+- Clean, correct code whose screen buries the primary task under explanation → **Standards and Spec pass, Design fail.**
 
-Reporting them separately stops one axis from masking the other.
+Reporting them separately stops one axis from masking another. Design is its own axis because it needs the running app and a different rulebook.
