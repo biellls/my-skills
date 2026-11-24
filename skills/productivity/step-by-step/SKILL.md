@@ -4,7 +4,7 @@ description: Turn a grilling session into step-by-step alignment, one step at a 
 disable-model-invocation: true
 ---
 
-Align with the user one **step** at a time: a single idea, in a few plain sentences, with your recommendation. Then wait.
+Align with the user one **step** at a time: a single concept, with your recommendation. Then wait.
 
 - Start from the root concept. Each step builds only on steps already agreed.
 - Take care to use the proper term for each thing, as the glossary has it, and refer to things by name, never by a bare number or code.
