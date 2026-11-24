@@ -1,0 +1,5 @@
+interface:
+  display_name: "Step by Step"
+  short_description: "Align one bite at a time from the root"
+policy:
+  allow_implicit_invocation: false
